@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 # Configuration de la connexion à la base de données
-DATABASE_URL = "postgresql://postgres:admin@localhost:5432/MSPR"
+DATABASE_URL = "postgresql://postgres:pwd@localhost:5432/mspr"
 
 # Définition des modèles SQLAlchemy
 Base = declarative_base()
