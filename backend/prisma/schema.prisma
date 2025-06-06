@@ -14,8 +14,8 @@ datasource db {
 }
 
 model Pays {
-  id_pays Int @id @default(autoincrement())
-  nom_pays String @unique @db.VarChar(100)
+  id_pays    Int     @id @default(autoincrement())
+  nom_pays   String  @unique @db.VarChar(100)
   population BigInt?
 
   statistiques StatistiquesJournalieres[]
@@ -24,17 +24,17 @@ model Pays {
 }
 
 model Virus {
-  id_virus Int @id @default(autoincrement())
+  id_virus  Int    @id @default(autoincrement())
   nom_virus String @unique @db.VarChar(50)
 
-  statistiques StatistiquesJournalieres[]
+  statistiques          StatistiquesJournalieres[]
   statistiques_globales StatistiquesGlobales[]
 
   @@map("Virus")
 }
 
 model Saisons {
-  id_saison Int @id @default(autoincrement())
+  id_saison  Int    @id @default(autoincrement())
   nom_saison String @unique @db.VarChar(20)
 
   statistiques StatistiquesJournalieres[]
@@ -43,24 +43,24 @@ model Saisons {
 }
 
 model StatistiquesJournalieres {
-  id_stat BigInt @id @default(autoincrement())
-  id_pays Int
-  id_virus Int
-  id_saison Int?
-  date DateTime @db.Date
-  nouveaux_cas Int @default(0)
-  nouveaux_deces Int @default(0)
-  total_cas Int @default(0)
-  total_deces Int @default(0)
-  croissance_cas Decimal? @db.Decimal(10, 4)
-  taux_mortalite Decimal? @db.Decimal(10, 4)
-  taux_infection Decimal? @db.Decimal(10, 4)
-  taux_mortalite_population Decimal? @db.Decimal(10, 4)
-  taux_infection_vs_global Decimal? @db.Decimal(10, 4)
+  id_stat                      BigInt   @id @default(autoincrement())
+  id_pays                      Int
+  id_virus                     Int
+  id_saison                    Int?
+  date                         DateTime @db.Date
+  nouveaux_cas                 Int      @default(0)
+  nouveaux_deces               Int      @default(0)
+  total_cas                    Int      @default(0)
+  total_deces                  Int      @default(0)
+  croissance_cas               Decimal? @db.Decimal(10, 4)
+  taux_mortalite               Decimal? @db.Decimal(10, 4)
+  taux_infection               Decimal? @db.Decimal(10, 4)
+  taux_mortalite_population    Decimal? @db.Decimal(10, 4)
+  taux_infection_vs_global     Decimal? @db.Decimal(10, 4)
   taux_mortalite_pop_vs_global Decimal? @db.Decimal(10, 4)
 
-  pays Pays @relation(fields: [id_pays], references: [id_pays])
-  virus Virus @relation(fields: [id_virus], references: [id_virus])
+  pays   Pays     @relation(fields: [id_pays], references: [id_pays])
+  virus  Virus    @relation(fields: [id_virus], references: [id_virus])
   saison Saisons? @relation(fields: [id_saison], references: [id_saison])
 
   @@unique([id_pays, id_virus, date], name: "Statistiques_Journalieres_id_pays_id_virus_date_key")
@@ -68,13 +68,13 @@ model StatistiquesJournalieres {
 }
 
 model StatistiquesGlobales {
-  id_global Int @id @default(autoincrement())
-  id_virus Int
-  date DateTime @db.Date
-  taux_infection_global_moyen Decimal? @db.Decimal(10, 4)
+  id_global                       Int      @id @default(autoincrement())
+  id_virus                        Int
+  date                            DateTime @db.Date
+  taux_infection_global_moyen     Decimal? @db.Decimal(10, 4)
   taux_mortalite_pop_global_moyen Decimal? @db.Decimal(10, 4)
-  total_cas_mondial BigInt?
-  total_deces_mondial BigInt?
+  total_cas_mondial               BigInt?
+  total_deces_mondial             BigInt?
 
   virus Virus @relation(fields: [id_virus], references: [id_virus])
 

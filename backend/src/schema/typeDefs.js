@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import { gql } from "graphql-tag";
 
 const typeDefs = gql`
   type Pays {
@@ -13,10 +13,17 @@ const typeDefs = gql`
     statistiques_journalieres: [StatistiquesJournalieres]
   }
 
+  type Saisons {
+    id_saison: ID!
+    nom_saison: String!
+    statistiques: [StatistiquesJournalieres]
+  }
+
   type StatistiquesJournalieres {
     id_stat: ID!
     id_pays: ID!
     id_virus: ID!
+    id_saison: ID!
     date: String!
     nouveaux_cas: Int
     nouveaux_deces: Int
@@ -24,6 +31,12 @@ const typeDefs = gql`
     total_deces: Int
     pays: Pays
     virus: Virus
+    croissance_cas: Float
+    taux_mortalite: Float
+    taux_infection: Float
+    taux_mortalite_population: Float
+    taux_infection_vs_global: Float
+    taux_mortalite_pop_vs_global: Float
   }
 
   type Query {
@@ -34,6 +47,9 @@ const typeDefs = gql`
     # Requêtes pour Virus
     virus(id_virus: ID): Virus
     allVirus: [Virus]
+
+    saison(id_saison: ID): Saisons
+    allSaisons: [Saisons]
 
     # Requêtes pour Statistiques
     statistique(id_stat: ID!): StatistiquesJournalieres
@@ -56,23 +72,23 @@ const typeDefs = gql`
 
     # Mutations pour Statistiques
     createStatistique(
-      id_pays: ID!,
-      id_virus: ID!,
-      date: String!,
-      nouveaux_cas: Int,
-      nouveaux_deces: Int,
-      total_cas: Int,
+      id_pays: ID!
+      id_virus: ID!
+      date: String!
+      nouveaux_cas: Int
+      nouveaux_deces: Int
+      total_cas: Int
       total_deces: Int
     ): StatistiquesJournalieres
-    
+
     updateStatistique(
-      id_stat: ID!,
-      nouveaux_cas: Int,
-      nouveaux_deces: Int,
-      total_cas: Int,
+      id_stat: ID!
+      nouveaux_cas: Int
+      nouveaux_deces: Int
+      total_cas: Int
       total_deces: Int
     ): StatistiquesJournalieres
-    
+
     deleteStatistique(id_stat: ID!): Boolean
   }
 `;
