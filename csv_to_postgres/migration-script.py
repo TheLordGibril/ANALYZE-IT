@@ -232,6 +232,7 @@ def migrer_donnees():
                     stat_existante = session.query(StatistiquesJournalieres).filter(
                         StatistiquesJournalieres.id_pays == id_pays,
                         StatistiquesJournalieres.id_virus == id_virus,
+                        StatistiquesJournalieres.id_saison == id_saison,
                         StatistiquesJournalieres.date == date_obj
                     ).first()
                     
@@ -239,6 +240,7 @@ def migrer_donnees():
                         nouvelle_stat = StatistiquesJournalieres(
                             id_pays=id_pays,
                             id_virus=id_virus,
+                            id_saison=id_saison,
                             date=date_obj,
                             total_cas=safe_int(row.get('total_cases', 0)),
                             total_deces=safe_int(row.get('total_deaths', 0)),
