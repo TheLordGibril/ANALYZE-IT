@@ -104,7 +104,7 @@ def migrer_donnees():
     try:
         # Connexion à la base de données
         print("Connexion à la base de données...")
-        engine = create_engine(DATABASE_URL)
+        engine = create_engine(DATABASE_URL,echo=True)
         
         # Création des tables si elles n'existent pas
         print("Création des tables...")
