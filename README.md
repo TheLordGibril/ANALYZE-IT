@@ -2,7 +2,10 @@
 
 ## 1. Modèle de données UML
 
-📁 Fichier : `csv_to_postgres/schema BDD.svg`
+- UML : `csv_to_postgres/schema BDD.svg`
+- MCD : `csv_to_postgres/MCD.svg`
+- MLD : `csv_to_postgres/MLD.svg`
+- MPD : `csv_to_postgres/MPD.svg`
 
 Représentation complète du schéma relationnel de la base de données utilisée pour centraliser les différentes sources de données.
 
@@ -28,6 +31,8 @@ Afin de créer la base de données PostgreSQL, veuillez télécharger la suite l
 ---
 
 ## 3. Mise en fonctionnement de l’Apollo Server
+
+**GraphQL** permet des requêtes souples et ciblées sur les données nettoyées.
 
 ### Configuration des variables d’environnement
 
@@ -87,13 +92,13 @@ Depuis le dossier `csv_to_postgres` :
 py -m venv venv
 ```
 
-1. Installer les dépendances :
+2. Installer les dépendances :
 
 ```bash
 pip install -r requirements.txt
 ```
 
-1. Lancer le script d’importation :
+3. Lancer le script d’importation :
 
 ```bash
 py migration-script.py
@@ -109,38 +114,27 @@ Contient l’ensemble du processus de préparation, nettoyage et fusion des donn
 
 ---
 
-## 6. API CRUD flexible (GraphQL)
-
-Créée avec **GraphQL** pour permettre des requêtes souples et ciblées sur les données nettoyées.
-
----
-
-## 7. Documentation API (OpenAPI Spec)
+## 6. Documentation API (OpenAPI Spec)
 
 [À compléter]
 
 ---
 
-## 8. Tableau de bord interactif
+## 7. Tableau de bord interactif
 
-Un outil de datavisualisation permet :
+Outil utilisé : Power BI
 
-- L’exploration des données historiques
-- L’exportation des visualisations
-- L’application de filtres pour faciliter la lecture
-
-Les choix de filtres seront justifiés dans la documentation.
-
-[Outil utilisé : Power BI ?]
+- Exploration des données historiques des pandémies
+- Exportation des visualisations
+- Application de filtres pour faciliter la lecture
 
 ---
 
-## 9. Documentation détaillée : collecte et nettoyage des données
+## 8. Documentation détaillée : collecte et nettoyage des données
 
 Résumé du notebook :
 
 > La fusion des jeux de données repose sur une normalisation préalable de chaque source pour garantir une homogénéité avant la fusion. Cela permet de minimiser les incohérences et de limiter le nettoyage post-fusion.
-> 
 
 ### Étapes clés :
 
@@ -160,49 +154,44 @@ Résumé du notebook :
 
 ---
 
-## 10. Benchmark des solutions techniques
+## 9. Benchmark des solutions techniques
 
-### 📌 1. **ETL & Préparation**
+### **ETL & Préparation**
 
 - `Pandas` → Référence en traitement CSV
 - `Jupyter Notebook` → Itération rapide et visualisation instantanée
 
 ---
 
-### 📌 2. **Stockage des données**
+### **Stockage des données**
 
-- **PostgreSQL** ✅ → Choix principal, robuste & intégré
-- **Alternatives** : MySQL, DuckDB, ClickHouse, BigQuery
+- **PostgreSQL (choix)** → Choix principal, robuste & intégré
+- **Alternatives** :
+    - MySQL / MariaDB → Bonne alternative si PostgreSQL n’est pas requis
+    - DuckDB → Idéal pour requêtes analytiques sur des fichiers locaux
+    - ClickHouse → Très rapide pour de la data analytique
+    - BigQuery → Si besoin de requêter des datasets massifs sur le cloud
 - **ORMs** :
     - Prisma (Node.js) → ORM typé, moderne et multi-SGBD
     - SQLAlchemy (Python) → Intégré pour l’export depuis le notebook
 
 ---
 
-### 📌 3. **API & CRUD**
+### **API & CRUD**
 
-- **GraphQL** → Requêtage ciblé et structuré
+- **GraphQL (choix)** → Requêtage ciblé et structuré
 - **REST (FastAPI, Express.js)** → Standard mais moins souple
 - **Librairies** : Apollo Server (Node.js)
 
 ---
 
-### 📌 4. **Tests d’API**
+### **Visualisation des données**
 
-- **Postman** → Tests automatisés
-- **Insomnia** → Alternative légère
-
----
-
-### 📌 5. **Visualisation des données**
-
-- `Matplotlib`, `Seaborn` → Explorations initiales
-- `Plotly`, `Bokeh` → Graphiques interactifs
-- `Power BI` → Recommandé pour filtres, export, et dashboards clairs
-- `Apache Superset`, `Metabase` → Solutions open-source
+- **Power BI (choix)** → Recommandé pour filtres, export, et dashboards clairs
+- **Matplotlib**, **Seaborn** → Explorations initiales
+- **Plotly**, **Bokeh** → Graphiques interactifs
+- **Apache Superset**, **Metabase** → Solutions open-source
 
 ---
 
-## 11. Diagramme de Gantt
-
-📌 Conseil : construisez-le au fil de l’avancement dans **Notion**, en attribuant les tâches par contributeur pour suivre efficacement le projet.
+## 10. Diagramme de Gantt
