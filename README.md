@@ -116,7 +116,7 @@ Contient l’ensemble du processus de préparation, nettoyage et fusion des donn
 
 ## 6. Documentation API (OpenAPI Spec)
 
-[À compléter]
+Le fichier `openapi.yaml` est ouvrable avec l'outil suivant, fourni par Swagger : https://swagger.io/tools/swagger-editor/
 
 ---
 
