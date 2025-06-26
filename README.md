@@ -179,6 +179,10 @@ Chaque page affiche 6 éléments d’information :
     - La descente dans la hiérarchie temporelle (année → trimestre → mois → jour) via le mode exploration
     - La possibilité de remonter dans la hiérarchie à l’aide du bouton situé à gauche du graphique
 
+### Export des données
+
+L'export des données peut se faire directement depuis Power BI de manière très modulable. Il suffit de sélectionner les données souhaitées en cliquant sur le graphique puis de cliquer sur les trois points et "Exporter". Ainsi, un fichier CSV contenant les données souhaitées sera téléchargé.
+
 ---
 
 ## 8. Documentation détaillée : collecte et nettoyage des données
