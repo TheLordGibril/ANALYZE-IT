@@ -98,7 +98,20 @@ py -m venv venv
 pip install -r requirements.txt
 ```
 
-3. Lancer le script d’importation :
+3. Crée le `.env` à l'aide du `.env.exemple` :
+
+```bash
+# Configuration base de données
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+
+CSV_FILE_PATH=
+```
+
+4. Lancer le script d’importation :
 
 ```bash
 py migration-script.py
