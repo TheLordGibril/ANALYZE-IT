@@ -1,2 +1,4 @@
 etl/venv/
 csv_to_postgres/venv/
+csv_to_postgres/.env
+csv_to_postgres/migration.log
