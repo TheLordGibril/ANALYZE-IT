@@ -246,3 +246,5 @@ Vous trouverez plus de détails dans le fichier `etl/data_cleaning.ipynb` concer
 ---
 
 ## 10. Diagramme de Gantt
+
+`Gantt.png`
