@@ -1,5 +1,10 @@
 # 📦 Livrables - Projet d’analyse de données pandémiques
 
+MICHAUD Gabriel
+FERRARETTO Kevin
+CERDAN Antoine
+KARAKHANYAN Gabriel
+
 ## 1. Modèle de données UML
 
 - UML : `csv_to_postgres/schema BDD.svg`
