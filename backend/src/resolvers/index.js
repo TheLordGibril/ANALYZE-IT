@@ -4,12 +4,12 @@ import axios from "axios";
 const resolvers = {
   Query: {
     // Résolveur pour prédiction de pandémie
-    predictPandemic: async (_, { country, virus, date }) => {
+    predictPandemic: async (_, { country, virus, date_start, date_end }) => {
       try {
         const response = await axios.get(
           `http://127.0.0.1:8000/predict`,
           {
-            params: { country, virus, date }
+            params: { country, virus, date_start, date_end }
           }
         );
         return response.data;

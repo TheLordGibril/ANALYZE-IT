@@ -41,7 +41,12 @@ const typeDefs = gql`
 
   type Query {
     # Requêtes pour les prédictions de pandémie
-    predictPandemic(country: String!, virus: String!, date: String!): JSON
+    predictPandemic(
+      country: String!
+      virus: String!
+      date_start: String!
+      date_end: String!
+    ): JSON
     
     # Requêtes pour Pays
     pays(id_pays: ID): Pays
