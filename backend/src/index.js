@@ -1,9 +1,9 @@
-import { ApolloServer } from '@apollo/server';
-import { startStandaloneServer } from '@apollo/server/standalone';
-import dotenv from 'dotenv';
-import typeDefs from './schema/typeDefs.js';
-import resolvers from './resolvers/index.js';
-import prisma from './prisma.js';
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from "@apollo/server/standalone";
+import dotenv from "dotenv";
+import typeDefs from "./schema/typeDefs.js";
+import resolvers from "./resolvers/index.js";
+import prisma from "./prisma.js";
 
 // Charger les variables d'environnement
 dotenv.config();
@@ -15,11 +15,11 @@ const server = new ApolloServer({
   context: ({ req }) => {
     return {
       prisma,
-      req
+      req,
     };
   },
   formatError: (error) => {
-    console.error('GraphQL Error:', error);
+    console.error("GraphQL Error:", error);
     return error;
   },
   csrfPrevention: false,
@@ -31,10 +31,21 @@ async function startServer() {
   const { url } = await startStandaloneServer(server, {
     listen: { port: PORT },
     context: async ({ req }) => {
-      return {
-        prisma,
-        req
-      };
+      const token = req.headers.authorization?.replace("Bearer ", "");
+      let user = null;
+
+      if (token) {
+        try {
+          const decoded = jwt.verify(token, process.env.KEY);
+          user = await prisma.user.findUnique({
+            where: { id_user: decoded.userId },
+          });
+        } catch (err) {
+          console.warn("Token invalide :", err.message);
+        }
+      }
+
+      return { prisma, user };
     },
   });
   console.log(`🚀 Serveur Apollo prêt à l'adresse ${url}`);
@@ -43,7 +54,7 @@ async function startServer() {
 startServer();
 
 // Fermeture propre du client Prisma lors de l'arrêt de l'application
-process.on('SIGINT', () => {
+process.on("SIGINT", () => {
   prisma.$disconnect();
   process.exit(0);
 });

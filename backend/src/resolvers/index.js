@@ -1,9 +1,15 @@
 import prisma from "../prisma.js";
 
+import bcrypt from "bcryptjs";
+import { GraphQLError } from "graphql";
+import { generateToken, requireAuth } from "../utils/auth.js";
+
 const resolvers = {
   Query: {
     // Résolveurs pour Pays
-    pays: async (_, { id_pays }) => {
+    pays: async (_, { id_pays }, { user }) => {
+      requireAuth(user);
+
       return await prisma.pays.findUnique({
         where: { id_pays: parseInt(id_pays) },
       });
@@ -59,6 +65,26 @@ const resolvers = {
   },
 
   Mutation: {
+    login: async (_, { email, password }) => {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) {
+        throw new GraphQLError("Utilisateur non trouvé", {
+          extensions: { code: "UNAUTHENTICATED" },
+        });
+      }
+
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) {
+        throw new GraphQLError("Mot de passe incorrect", {
+          extensions: { code: "UNAUTHENTICATED" },
+        });
+      }
+
+      const token = generateToken(user.id_user);
+
+      return { token };
+    },
+
     // Mutations pour Pays
     createPays: async (_, { nom_pays }) => {
       return await prisma.pays.create({
