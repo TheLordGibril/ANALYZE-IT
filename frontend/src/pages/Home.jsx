@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Input from "../components/Input";
 
 const models = [
     "total_cases",
@@ -40,37 +41,7 @@ const AnalyzeIt = () => {
 
             <div className="flex flex-1">
                 {/* Sidebar */}
-                <div className="w-64 bg-gray-100 text-black p-4 space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium">Pays</label>
-                        <Input defaultValue="France" />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium">Virus</label>
-                        <Input defaultValue="Covid" />
-                    </div>
-                    <div className="space-y-1">
-                        <label className="block text-sm font-medium">Début</label>
-                        <Input type="date" defaultValue="2019-09-01" />
-                        <label className="block text-sm font-medium">Fin</label>
-                        <Input type="date" defaultValue="2021-03-01" />
-                    </div>
-
-                    <div>
-                        <h4 className="text-sm font-semibold mt-4 mb-2">Models</h4>
-                        <div className="space-y-1">
-                            {models.map((model) => (
-                                <div key={model} className="flex items-center space-x-2">
-                                    <Checkbox
-                                        checked={selectedModels.includes(model)}
-                                        onCheckedChange={() => toggleModel(model)}
-                                    />
-                                    <span className="text-sm">{model}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+                <Input />
 
                 {/* Main Content */}
                 <div className="flex-1 bg-white p-6 text-black grid grid-cols-3 gap-4">
