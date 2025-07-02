@@ -1,4 +1,5 @@
 import prisma from "../prisma.js";
+import axios from "axios";
 
 import bcrypt from "bcryptjs";
 import { GraphQLError } from "graphql";
@@ -6,6 +7,21 @@ import { generateToken, requireAuth } from "../utils/auth.js";
 
 const resolvers = {
   Query: {
+    // Résolveur pour prédiction de pandémie
+    predictPandemic: async (_, { country, virus, date_start, date_end }) => {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8000/predict`,
+          {
+            params: { country, virus, date_start, date_end }
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error("Erreur lors de l'appel à l'API ML:", error.message);
+        throw new Error("Erreur API ML");
+      }
+    },
     // Résolveurs pour Pays
     pays: async (_, { id_pays }, { user }) => {
       requireAuth(user);

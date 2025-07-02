@@ -40,6 +40,14 @@ const typeDefs = gql`
   }
 
   type Query {
+    # Requêtes pour les prédictions de pandémie
+    predictPandemic(
+      country: String!
+      virus: String!
+      date_start: String!
+      date_end: String!
+    ): JSON
+    
     # Requêtes pour Pays
     pays(id_pays: ID): Pays
     allPays: [Pays]
@@ -58,6 +66,7 @@ const typeDefs = gql`
     statistiquesByDate(date: String!): [StatistiquesJournalieres]
     allStatistiques: [StatistiquesJournalieres]
   }
+  scalar JSON
 
   type Mutation {
     # Mutations pour Pays

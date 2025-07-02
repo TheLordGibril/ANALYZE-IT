@@ -1,5 +1,10 @@
 # 📦 Livrables - Projet d’analyse de données pandémiques
 
+MICHAUD Gabriel
+FERRARETTO Kevin
+CERDAN Antoine
+KARAKHANYAN Gabriel
+
 ## 1. Modèle de données UML
 
 - UML : `csv_to_postgres/schema BDD.svg`
@@ -98,7 +103,20 @@ py -m venv venv
 pip install -r requirements.txt
 ```
 
-3. Lancer le script d’importation :
+3. Crée le `.env` à l'aide du `.env.exemple` :
+
+```bash
+# Configuration base de données
+DB_HOST=
+DB_PORT=
+DB_NAME=
+DB_USER=
+DB_PASSWORD=
+
+CSV_FILE_PATH=
+```
+
+4. Lancer le script d’importation :
 
 ```bash
 py migration-script.py
@@ -116,23 +134,76 @@ Contient l’ensemble du processus de préparation, nettoyage et fusion des donn
 
 ## 6. Documentation API (OpenAPI Spec)
 
-[À compléter]
+Le fichier `backend/openapi.yaml` est ouvrable avec l'outil suivant, fourni par Swagger : https://swagger.io/tools/swagger-editor/
 
 ---
 
 ## 7. Tableau de bord interactif
 
-Outil utilisé : Power BI
+**Outil utilisé :** Power BI
 
-- Exploration des données historiques des pandémies
-- Exportation des visualisations
-- Application de filtres pour faciliter la lecture
+**Objectif :**
+
+Observer l’évolution de la contamination et de la mortalité des virus COVID-19 et de la variole du singe dans le monde.
+
+### Sources de données
+
+- Base de données PostgreSQL
+- Tables : `Pays`, `Virus`, `Statistiques journalières`
+
+### Indicateurs clés
+
+**Statistiques journalières :**
+
+- **Contamination** : Nombre total de cas, nombre de nouveaux cas, taux d’infection → *deuxième page*
+- **Mortalité** : Nombre total de décès, nombre de nouveaux décès, taux de mortalité → *troisième page*
+
+### Fonctionnalités
+
+- Sélection des pays → *Première page*
+- Sélection du virus → *Première page*
+- Parcours des périodes (années, trimestres, mois, jours) → *via interaction avec les graphiques*
+
+### Justification
+
+Nous avons souhaité que l’utilisation de Power BI soit la plus simple possible pour l’utilisateur, notamment grâce à un design agréable et épuré.
+
+Afin d’améliorer la lisibilité des graphiques, la section "Filtres" a été séparée sur une première page dédiée.
+
+Il est possible d’y sélectionner un virus à l’aide de boutons radio, car la visualisation simultanée des données des deux virus n’est pas lisible.
+
+Pour la sélection des pays, plusieurs options sont possibles : ne rien sélectionner, tout sélectionner (pour avoir les données mondiales), ou choisir un pays ou un groupe de pays grâce à la barre de recherche.
+
+### Visualisation des données
+
+Chaque page affiche 6 éléments d’information :
+
+1. Le nom de la page actuelle (en gras)
+2. Le virus sélectionné
+3. Le(s) pays sélectionné(s) :
+    - Si aucun ou tous les pays sont sélectionnés → **Monde entier**
+    - Si un seul pays est sélectionné → **Nom du pays**
+    - Si plusieurs pays sont sélectionnés → **"Plusieurs pays sélectionnés"**
+4. Un graphique de l’évolution des cas totaux dans le temps
+5. Un graphique de l’évolution des nouveaux cas dans le temps
+6. Un graphique de l’évolution des taux (de mortalité ou de contamination) dans le temps
+
+### Choix des visualisations
+
+- **Cas totaux** : affichés sous forme de courbe pour faciliter la lecture dans le temps, notamment avec un grand volume de données journalières.
+- **Nouveaux cas et taux** : affichés sous forme de graphiques en barres, permettant :
+    - La comparaison visuelle avec les périodes précédentes
+    - L’exploration de plages temporelles précises (grâce à l’interaction avec les barres)
+    - La descente dans la hiérarchie temporelle (année → trimestre → mois → jour) via le mode exploration
+    - La possibilité de remonter dans la hiérarchie à l’aide du bouton situé à gauche du graphique
+
+### Export des données
+
+L'export des données peut se faire directement depuis Power BI de manière très modulable. Il suffit de sélectionner les données souhaitées en cliquant sur le graphique puis de cliquer sur les trois points et "Exporter". Ainsi, un fichier CSV contenant les données souhaitées sera téléchargé.
 
 ---
 
 ## 8. Documentation détaillée : collecte et nettoyage des données
-
-Résumé du notebook :
 
 > La fusion des jeux de données repose sur une normalisation préalable de chaque source pour garantir une homogénéité avant la fusion. Cela permet de minimiser les incohérences et de limiter le nettoyage post-fusion.
 
@@ -151,6 +222,8 @@ Résumé du notebook :
     - % de population touchée
     - Saisonnalité
     - Moyennes mondiales de référence
+
+Vous trouverez plus de détails dans le fichier `etl/data_cleaning.ipynb` concernant la démarche suivie. Le code est commenté et documenté.
 
 ---
 
@@ -179,7 +252,7 @@ Résumé du notebook :
 
 ### **API & CRUD**
 
-- **GraphQL (choix)** → Requêtage ciblé et structuré
+- **GraphQL (choix)** → Requêtage ciblé et structuré comme demandé
 - **REST (FastAPI, Express.js)** → Standard mais moins souple
 - **Librairies** : Apollo Server (Node.js)
 
@@ -195,3 +268,5 @@ Résumé du notebook :
 ---
 
 ## 10. Diagramme de Gantt
+
+`Gantt.png`
