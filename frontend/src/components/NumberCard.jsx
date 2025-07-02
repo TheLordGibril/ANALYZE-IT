@@ -1,6 +1,6 @@
 export default function NumberCard({ name, value }) {
     return (
-        <div>
+        <div className="text-black">
             <p>{name}</p>
             <p>{value}</p>
         </div>

@@ -1,6 +1,6 @@
 export default function GraphCard({ name, value }) {
     return (
-        <div>
+        <div className="text-black">
             <p>{name}</p>
             <p>graph ici</p>
         </div>
