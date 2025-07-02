@@ -1,0 +1,466 @@
+openapi: 3.0.0
+info:
+  title: API Statistiques Virus GraphQL
+  description: Documentation Swagger pour l'API GraphQL de suivi des statistiques de virus par pays et saisons
+  version: 1.0.1
+  contact:
+    name: Support API
+    email: support@stats-virus.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:4000
+    description: Serveur de développement
+  - url: https://api.stats-virus.com
+    description: Serveur de production
+
+paths:
+  /graphql:
+    post:
+      summary: Endpoint GraphQL principal
+      description: Endpoint unique pour toutes les requêtes GraphQL (queries, mutations)
+      tags:
+        - GraphQL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GraphQLRequest'
+            examples:
+              # QUERIES
+              getAllPays:
+                summary: Récupérer tous les pays
+                value:
+                  query: "{ allPays { id_pays nom_pays } }"
+              
+              getPaysById:
+                summary: Récupérer un pays par ID (nécessite authentification)
+                value:
+                  query: "query GetPays($id: ID) { pays(id_pays: $id) { id_pays nom_pays statistiques_journalieres { date nouveaux_cas total_cas } } }"
+                  variables: { "id": "1" }
+              
+              getAllVirus:
+                summary: Récupérer tous les virus
+                value:
+                  query: "{ allVirus { id_virus nom_virus } }"
+              
+              getVirusById:
+                summary: Récupérer un virus par ID
+                value:
+                  query: "query GetVirus($id: ID) { virus(id_virus: $id) { id_virus nom_virus statistiques_journalieres { date nouveaux_cas nouveaux_deces } } }"
+                  variables: { "id": "1" }
+              
+              getAllSaisons:
+                summary: Récupérer toutes les saisons
+                value:
+                  query: "{ allSaisons { id_saison nom_saison } }"
+              
+              getSaisonById:
+                summary: Récupérer une saison par ID
+                value:
+                  query: "query GetSaison($id: ID) { saison(id_saison: $id) { id_saison nom_saison statistiques { date nouveaux_cas } } }"
+                  variables: { "id": "1" }
+              
+              getStatistiqueById:
+                summary: Récupérer une statistique par ID
+                value:
+                  query: "query GetStatistique($id: ID!) { statistique(id_stat: $id) { id_stat date nouveaux_cas nouveaux_deces total_cas total_deces pays { nom_pays } virus { nom_virus } croissance_cas taux_mortalite taux_infection } }"
+                  variables: { "id": "123" }
+              
+              getStatistiquesByPays:
+                summary: Récupérer les statistiques d'un pays
+                value:
+                  query: "query GetStatsByPays($id_pays: ID!) { statistiquesByPays(id_pays: $id_pays) { date nouveaux_cas nouveaux_deces virus { nom_virus } taux_mortalite croissance_cas } }"
+                  variables: { "id_pays": "1" }
+              
+              getStatistiquesByVirus:
+                summary: Récupérer les statistiques d'un virus
+                value:
+                  query: "query GetStatsByVirus($id_virus: ID!) { statistiquesByVirus(id_virus: $id_virus) { date nouveaux_cas pays { nom_pays } taux_infection croissance_cas } }"
+                  variables: { "id_virus": "1" }
+              
+              getStatistiquesByDate:
+                summary: Récupérer les statistiques d'une date
+                value:
+                  query: "query GetStatsByDate($date: String!) { statistiquesByDate(date: $date) { pays { nom_pays } virus { nom_virus } nouveaux_cas nouveaux_deces taux_mortalite } }"
+                  variables: { "date": "2024-01-15" }
+              
+              getAllStatistiques:
+                summary: Récupérer toutes les statistiques
+                value:
+                  query: "{ allStatistiques { id_stat date nouveaux_cas pays { nom_pays } virus { nom_virus } taux_mortalite croissance_cas } }"
+
+              predictPandemic:
+                summary: Prédire l'évolution d'une pandémie
+                value:
+                  query: "query PredictPandemic($country: String!, $virus: String!, $date_start: String!, $date_end: String!) { predictPandemic(country: $country, virus: $virus, date_start: $date_start, date_end: $date_end) }"
+                  variables: {
+                    "country": "France",
+                    "virus": "COVID-19",
+                    "date_start": "2024-01-01",
+                    "date_end": "2024-12-31"
+                  }
+
+              # MUTATIONS
+              login:
+                summary: Connexion utilisateur
+                value:
+                  query: "mutation Login($email: String!, $password: String!) { login(email: $email, password: $password) { token } }"
+                  variables: { "email": "user@example.com", "password": "motdepasse" }
+
+              createPays:
+                summary: Créer un nouveau pays
+                value:
+                  query: "mutation CreatePays($nom: String!) { createPays(nom_pays: $nom) { id_pays nom_pays } }"
+                  variables: { "nom": "France" }
+              
+              updatePays:
+                summary: Mettre à jour un pays
+                value:
+                  query: "mutation UpdatePays($id: ID!, $nom: String!) { updatePays(id_pays: $id, nom_pays: $nom) { id_pays nom_pays } }"
+                  variables: { "id": "1", "nom": "République Française" }
+              
+              deletePays:
+                summary: Supprimer un pays
+                value:
+                  query: "mutation DeletePays($id: ID!) { deletePays(id_pays: $id) }"
+                  variables: { "id": "1" }
+              
+              createVirus:
+                summary: Créer un nouveau virus
+                value:
+                  query: "mutation CreateVirus($nom: String!) { createVirus(nom_virus: $nom) { id_virus nom_virus } }"
+                  variables: { "nom": "COVID-19" }
+              
+              updateVirus:
+                summary: Mettre à jour un virus
+                value:
+                  query: "mutation UpdateVirus($id: ID!, $nom: String!) { updateVirus(id_virus: $id, nom_virus: $nom) { id_virus nom_virus } }"
+                  variables: { "id": "1", "nom": "SARS-CoV-2" }
+              
+              deleteVirus:
+                summary: Supprimer un virus
+                value:
+                  query: "mutation DeleteVirus($id: ID!) { deleteVirus(id_virus: $id) }"
+                  variables: { "id": "1" }
+              
+              createStatistique:
+                summary: Créer une nouvelle statistique
+                description: "Note: Les valeurs par défaut sont 0 pour nouveaux_cas, nouveaux_deces, total_cas, total_deces si non spécifiées"
+                value:
+                  query: "mutation CreateStatistique($id_pays: ID!, $id_virus: ID!, $date: String!, $nouveaux_cas: Int, $nouveaux_deces: Int, $total_cas: Int, $total_deces: Int) { createStatistique(id_pays: $id_pays, id_virus: $id_virus, date: $date, nouveaux_cas: $nouveaux_cas, nouveaux_deces: $nouveaux_deces, total_cas: $total_cas, total_deces: $total_deces) { id_stat date nouveaux_cas nouveaux_deces total_cas total_deces pays { nom_pays } virus { nom_virus } } }"
+                  variables: { 
+                    "id_pays": "1", 
+                    "id_virus": "1", 
+                    "date": "2024-01-15", 
+                    "nouveaux_cas": 150, 
+                    "nouveaux_deces": 5, 
+                    "total_cas": 10000, 
+                    "total_deces": 200 
+                  }
+              
+              updateStatistique:
+                summary: Mettre à jour une statistique
+                description: "Note: Seuls les champs fournis seront mis à jour (mise à jour partielle possible)"
+                value:
+                  query: "mutation UpdateStatistique($id: ID!, $nouveaux_cas: Int, $nouveaux_deces: Int, $total_cas: Int, $total_deces: Int) { updateStatistique(id_stat: $id, nouveaux_cas: $nouveaux_cas, nouveaux_deces: $nouveaux_deces, total_cas: $total_cas, total_deces: $total_deces) { id_stat nouveaux_cas nouveaux_deces total_cas total_deces } }"
+                  variables: { 
+                    "id": "123", 
+                    "nouveaux_cas": 200, 
+                    "total_cas": 10200
+                  }
+              
+              deleteStatistique:
+                summary: Supprimer une statistique
+                value:
+                  query: "mutation DeleteStatistique($id: ID!) { deleteStatistique(id_stat: $id) }"
+                  variables: { "id": "123" }
+
+      responses:
+        '200':
+          description: Réponse GraphQL réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphQLResponse'
+              examples:
+                paysResponse:
+                  summary: Réponse liste des pays
+                  value:
+                    data:
+                      allPays:
+                        - id_pays: "1"
+                          nom_pays: "France"
+                        - id_pays: "2"
+                          nom_pays: "Allemagne"
+
+                predictionResponse:
+                  summary: Réponse de prédiction de pandémie
+                  value:
+                    data:
+                      predictPandemic:
+                        prediction: "Données de prédiction ML"
+                        accuracy: 0.85
+                        trends: []
+
+                loginResponse:
+                  summary: Réponse de connexion réussie
+                  value:
+                    data:
+                      login:
+                        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+                statistiqueResponse:
+                  summary: Réponse statistique détaillée
+                  value:
+                    data:
+                      statistique:
+                        id_stat: "123"
+                        date: "2024-01-15"
+                        nouveaux_cas: 150
+                        nouveaux_deces: 5
+                        total_cas: 10000
+                        total_deces: 200
+                        pays:
+                          nom_pays: "France"
+                        virus:
+                          nom_virus: "COVID-19"
+                        croissance_cas: 1.5
+                        taux_mortalite: 2.0
+                        taux_infection: 0.1
+                
+                deleteResponse:
+                  summary: Réponse de suppression réussie
+                  value:
+                    data:
+                      deletePays: true
+                
+                deleteErrorResponse:
+                  summary: Réponse de suppression avec erreur
+                  value:
+                    data:
+                      deletePays: false
+                    errors:
+                      - message: "Impossible de supprimer le pays (contrainte de clé étrangère)"
+                        extensions:
+                          code: "DELETE_FAILED"
+
+                authErrorResponse:
+                  summary: Erreur d'authentification
+                  value:
+                    errors:
+                      - message: "Vous devez être connecté"
+                        extensions:
+                          code: "UNAUTHENTICATED"
+
+        '400':
+          description: Requête GraphQL invalide
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphQLErrorResponse'
+        
+        '500':
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GraphQLErrorResponse'
+
+components:
+  schemas:
+    GraphQLRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: Requête GraphQL
+        variables:
+          type: object
+          description: Variables pour la requête
+        operationName:
+          type: string
+          description: Nom de l'opération
+
+    GraphQLResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Données de la réponse
+        errors:
+          type: array
+          description: Erreurs GraphQL
+          items:
+            $ref: '#/components/schemas/GraphQLError'
+        extensions:
+          type: object
+          description: Métadonnées supplémentaires
+
+    GraphQLErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/GraphQLError'
+
+    GraphQLError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur
+        locations:
+          type: array
+          description: Localisation de l'erreur dans la requête
+          items:
+            type: object
+            properties:
+              line:
+                type: integer
+              column:
+                type: integer
+        path:
+          type: array
+          description: Chemin vers le champ en erreur
+          items:
+            type: string
+        extensions:
+          type: object
+          description: Informations supplémentaires sur l'erreur
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token JWT d'authentification
+
+    Pays:
+      type: object
+      properties:
+        id_pays:
+          type: string
+          description: Identifiant unique du pays
+        nom_pays:
+          type: string
+          description: Nom du pays
+        population:
+          type: integer
+          format: int64
+          description: Population du pays
+        statistiques_journalieres:
+          type: array
+          description: Liste des statistiques journalières pour ce pays
+          items:
+            $ref: '#/components/schemas/StatistiquesJournalieres'
+
+    Virus:
+      type: object
+      properties:
+        id_virus:
+          type: string
+          description: Identifiant unique du virus
+        nom_virus:
+          type: string
+          description: Nom du virus
+        statistiques_journalieres:
+          type: array
+          description: Liste des statistiques journalières pour ce virus
+          items:
+            $ref: '#/components/schemas/StatistiquesJournalieres'
+
+    Saisons:
+      type: object
+      properties:
+        id_saison:
+          type: string
+          description: Identifiant unique de la saison
+        nom_saison:
+          type: string
+          description: Nom de la saison
+        statistiques:
+          type: array
+          description: Liste des statistiques pour cette saison
+          items:
+            $ref: '#/components/schemas/StatistiquesJournalieres'
+
+    StatistiquesJournalieres:
+      type: object
+      properties:
+        id_stat:
+          type: string
+          description: Identifiant unique de la statistique
+        id_pays:
+          type: string
+          description: ID du pays associé
+        id_virus:
+          type: string
+          description: ID du virus associé
+        id_saison:
+          type: string
+          description: ID de la saison associée (optionnel)
+        date:
+          type: string
+          description: Date de la statistique
+          example: "2024-01-15"
+        nouveaux_cas:
+          type: integer
+          description: Nombre de nouveaux cas ce jour
+          example: 150
+        nouveaux_deces:
+          type: integer
+          description: Nombre de nouveaux décès ce jour
+          example: 5
+        total_cas:
+          type: integer
+          description: Total cumulé des cas
+          example: 10000
+        total_deces:
+          type: integer
+          description: Total cumulé des décès
+          example: 200
+        pays:
+          $ref: '#/components/schemas/Pays'
+        virus:
+          $ref: '#/components/schemas/Virus'
+        croissance_cas:
+          type: number
+          format: float
+          description: Taux de croissance des cas
+          example: 1.5
+        taux_mortalite:
+          type: number
+          format: float
+          description: Taux de mortalité
+          example: 2.0
+        taux_infection:
+          type: number
+          format: float
+          description: Taux d'infection
+          example: 0.1
+        taux_mortalite_population:
+          type: number
+          format: float
+          description: Taux de mortalité par rapport à la population
+        taux_infection_vs_global:
+          type: number
+          format: float
+          description: Taux d'infection comparé au global
+        taux_mortalite_pop_vs_global:
+          type: number
+          format: float
+          description: Taux de mortalité population comparé au global
+
+tags:
+  - name: GraphQL
+    description: Opérations GraphQL pour les statistiques de virus
+    externalDocs:
+      description: Documentation GraphQL
+      url: https://graphql.org/learn/
