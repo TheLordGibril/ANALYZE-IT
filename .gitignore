@@ -4,3 +4,4 @@ csv_to_postgres/.env
 csv_to_postgres/migration.log
 csv_to_postgres/__pycache__/
 csv_to_postgres/venv-bdd/
+.idea/
