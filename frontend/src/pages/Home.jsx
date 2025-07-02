@@ -3,7 +3,6 @@ import Input from "../components/Input";
 import GraphCard from "../components/GraphCard";
 import NumberCard from "../components/NumberCard";
 import TextCard from "../components/TextCard";
-import { fetchPrediction } from "../services/ApiService";
 
 const AnalyzeIt = () => {
   const [selectedModels, setSelectedModels] = useState([]);
