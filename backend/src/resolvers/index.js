@@ -81,25 +81,6 @@ const resolvers = {
   },
 
   Mutation: {
-    login: async (_, { email, password }) => {
-      const user = await prisma.user.findUnique({ where: { email } });
-      if (!user) {
-        throw new GraphQLError("Utilisateur non trouvé", {
-          extensions: { code: "UNAUTHENTICATED" },
-        });
-      }
-
-      const valid = await bcrypt.compare(password, user.password);
-      if (!valid) {
-        throw new GraphQLError("Mot de passe incorrect", {
-          extensions: { code: "UNAUTHENTICATED" },
-        });
-      }
-
-      const token = generateToken(user.id_user);
-
-      return { token };
-    },
 
     // Mutations pour Pays
     createPays: async (_, { nom_pays }) => {
