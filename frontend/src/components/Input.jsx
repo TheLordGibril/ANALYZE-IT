@@ -1,4 +1,11 @@
-export default function Input() {
+export default function Input({ selectedModels, setSelectedModels }) {
+    const allModels = ["total_cases", "total_deaths", "new_cases", "new_deaths", "transmission_rate", "mortality_rate", "geographic_spread", "peak_date", "estimated_duration_days", "cases_in_30d", "deaths_in_30d", "new_countries_next_week"]
+
+    const handleSetSelectedModels = (model) => {
+        setSelectedModels((prev) =>
+            prev.includes(model) ? prev.filter((m) => m !== model) : [...prev, model]
+        )
+    }
     // const api_url = http://127.0.0.1:8000/predict?country=France&virus=covid&date_start=2025-03-01&date_end=2025-07-01
     return (
         <div>
@@ -21,15 +28,16 @@ export default function Input() {
                 <div>
                     <h4 className="text-sm font-semibold mt-4 mb-2">Models</h4>
                     <div className="space-y-1">
-                        {/* {models.map((model) => (
+                        {allModels.map((model) => (
                             <div key={model} className="flex items-center space-x-2">
-                                <Checkbox
+                                <input
+                                    type="checkbox"
                                     checked={selectedModels.includes(model)}
-                                    onCheckedChange={() => toggleModel(model)}
+                                    onChange={() => handleSetSelectedModels(model)}
                                 />
                                 <span className="text-sm">{model}</span>
                             </div>
-                        ))} */}
+                        ))}
                     </div>
                 </div>
             </div>
