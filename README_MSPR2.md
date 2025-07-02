@@ -1,11 +1,11 @@
 ## **Lancer l'API IA**
 
 ```bash
+cd ml_api
 python -m venv venv
 venv\Scripts\activate  # Sur Windows
 source venv/bin/activate # Sur Linux
-```
-```bash
+
 pip install -r requirements.txt
 uvicorn app:app --reload
 ```
