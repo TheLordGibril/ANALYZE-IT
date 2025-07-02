@@ -89,7 +89,72 @@ def main():
     train_and_save_model(X_cases, y_total_deaths,
                          "models/total_deaths_model.joblib")
 
-    print("Tous les modèles sont entraînés et sauvegardés.")
+    df['year'] = df['date'].dt.year
+    peak_days = (
+        df.groupby(['id_pays', 'id_virus', 'year'])[
+            ['nouveaux_cas', 'day_of_year']]
+        .apply(lambda g: g.loc[g['nouveaux_cas'].idxmax(), 'day_of_year'])
+        .reset_index(name='peak_day_of_year')
+    )
+    df_peak = pd.merge(df, peak_days, on=['id_pays', 'id_virus', 'year'])
+    X_peak = df_peak[["id_pays", "id_virus", "day_of_year"]].values
+    y_peak = df_peak["peak_day_of_year"].values
+    train_and_save_model(X_peak, y_peak, "models/peak_date_model.joblib")
+
+    duration = (
+        df[df['nouveaux_cas'] > 0]
+        .groupby(['id_pays', 'id_virus', 'year'])['day_of_year']
+        .agg(['min', 'max'])
+        .reset_index()
+    )
+
+    duration['duration'] = duration['max'] - duration['min'] + 1
+    df_duration = pd.merge(df, duration, on=['id_pays', 'id_virus', 'year'])
+    X_duration = df_duration[["id_pays", "id_virus", "day_of_year"]].values
+    y_duration = df_duration["duration"].values
+    train_and_save_model(X_duration, y_duration,
+                         "models/estimated_duration_model.joblib")
+
+    df = df.sort_values(['id_pays', 'id_virus', 'date'])
+    df['cases_in_30d'] = df.groupby(['id_pays', 'id_virus'])['nouveaux_cas'].transform(
+        lambda x: x.rolling(
+            window=30, min_periods=1).sum().shift(-29).fillna(0)
+    )
+    df['deaths_in_30d'] = df.groupby(['id_pays', 'id_virus'])['nouveaux_deces'].transform(
+        lambda x: x.rolling(
+            window=30, min_periods=1).sum().shift(-29).fillna(0)
+    )
+    X_30d = df[features].values
+    y_cases_30d = df["cases_in_30d"].values
+    y_deaths_30d = df["deaths_in_30d"].values
+    train_and_save_model(X_30d, y_cases_30d,
+                         "models/cases_in_30d_model.joblib")
+    train_and_save_model(X_30d, y_deaths_30d,
+                         "models/deaths_in_30d_model.joblib")
+
+    df['cases_in_7d'] = df.groupby(['id_pays', 'id_virus'])['nouveaux_cas'].transform(
+        lambda x: x.rolling(window=7, min_periods=1).sum().shift(-6).fillna(0)
+    )
+    df['deaths_in_7d'] = df.groupby(['id_pays', 'id_virus'])['nouveaux_deces'].transform(
+        lambda x: x.rolling(window=7, min_periods=1).sum().shift(-6).fillna(0)
+    )
+    X_7d = df[features].values
+    y_cases_7d = df["cases_in_7d"].values
+    y_deaths_7d = df["deaths_in_7d"].values
+    train_and_save_model(X_7d, y_cases_7d, "models/cases_in_7d_model.joblib")
+    train_and_save_model(X_7d, y_deaths_7d, "models/deaths_in_7d_model.joblib")
+
+    geo_spread = (
+        df.groupby(['id_virus', 'year'])['id_pays']
+        .nunique()
+        .reset_index(name='num_countries_affected')
+    )
+    X_geo = geo_spread[["id_virus", "year"]].values
+    y_geo = geo_spread["num_countries_affected"].values
+    train_and_save_model(X_geo, y_geo, "models/geographic_spread_model.joblib")
+
+
+print("Tous les modèles sont entraînés et sauvegardés.")
 
 
 if __name__ == "__main__":

@@ -91,6 +91,47 @@ def model_total_deaths(country_id, virus_id, date):
     return int(total_deaths_model.predict(X)[0])
 
 
+def model_geographic_spread(country_id, virus_id, date_start, nb_days):
+    # À remplacer par un vrai modèle multilabel
+    all_countries = ["France", "Italy", "Spain", "Germany", "UK"]
+    # Exemple : on retourne 2 pays au hasard
+    import random
+    return random.sample(all_countries, k=2)
+
+
+def model_peak_date(country_id, virus_id, date_start):
+    # À remplacer par un vrai modèle de régression
+    d = datetime.strptime(date_start, "%Y-%m-%d")
+    # Mock : pic dans 15 à 40 jours
+    import random
+    peak = d + timedelta(days=random.randint(15, 40))
+    return peak.strftime("%Y-%m-%d")
+
+
+def model_estimated_duration(country_id, virus_id, date_start):
+    # À remplacer par un vrai modèle de régression
+    import random
+    return random.randint(60, 180)
+
+
+def model_cases_in_30d(country_id, virus_id, date_start):
+    # À remplacer par un vrai modèle de régression
+    import random
+    return random.randint(10000, 500000)
+
+
+def model_deaths_in_30d(country_id, virus_id, date_start):
+    # À remplacer par un vrai modèle de régression
+    import random
+    return random.randint(500, 20000)
+
+
+def model_new_countries_next_week(country_id, virus_id, date_start):
+    # À remplacer par un vrai modèle de régression ou classification
+    import random
+    return random.randint(0, 5)
+
+
 def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
     """
     Calcule des prédictions pour un pays et un virus donnés sur une période.
@@ -109,16 +150,15 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
         country_id, virus_id, date_start, nb_days)
     total_cases = model_total_cases(country_id, virus_id, date_end)
     total_deaths = model_total_deaths(country_id, virus_id, date_end)
-
-    # geographic_spread = model_geographic_spread(country, virus, date)
-    # peak_date = model_peak_date(country, virus, date)
-    # estimated_duration_days = model_estimated_duration(country, virus, date)
-    # cases_in_30d = model_cases_in_30d(country, virus, date)
-    # deaths_in_30d = model_deaths_in_30d(country, virus, date)
-    # new_countries_next_week = model_new_countries_next_week(
-    #     country, virus, date)
-
-    # Calcul des totaux cumulés (exemple simple)
+    geographic_spread = model_geographic_spread(
+        country_id, virus_id, date_start, nb_days)
+    peak_date = model_peak_date(country_id, virus_id, date_start)
+    estimated_duration_days = model_estimated_duration(
+        country_id, virus_id, date_start)
+    cases_in_30d = model_cases_in_30d(country_id, virus_id, date_start)
+    deaths_in_30d = model_deaths_in_30d(country_id, virus_id, date_start)
+    new_countries_next_week = model_new_countries_next_week(
+        country_id, virus_id, date_start)
 
     return {
         "country": country,
@@ -130,11 +170,11 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
             "new_deaths": new_deaths,
             "transmission_rate": transmission_rate,
             "mortality_rate": mortality_rate,
-            # "geographic_spread": geographic_spread,
-            # "peak_date": peak_date,
-            # "estimated_duration_days": estimated_duration_days,
-            # "cases_in_30d": cases_in_30d,
-            # "deaths_in_30d": deaths_in_30d,
-            # "new_countries_next_week": new_countries_next_week
+            "geographic_spread": geographic_spread,
+            "peak_date": peak_date,
+            "estimated_duration_days": estimated_duration_days,
+            "cases_in_30d": cases_in_30d,
+            "deaths_in_30d": deaths_in_30d,
+            "new_countries_next_week": new_countries_next_week
         }
     }
