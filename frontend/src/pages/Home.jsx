@@ -1,28 +1,29 @@
 import React, { useState } from "react";
 import Input from "../components/Input";
 import GraphCard from "../components/GraphCard";
-import NumberCard from "../components/TextCard";
+import NumberCard from "../components/NumberCard";
 import TextCard from "../components/TextCard";
 
 const AnalyzeIt = () => {
     const [selectedModels, setSelectedModels] = useState([]);
 
-    const numbers = ["total_cases", "total_deaths", "new_cases", "new_deaths", "case_in_30d", "deaths_in_30d", "new_countries_next_week"];
+    const numbers = ["total_cases", "total_deaths", "new_cases", "new_deaths", "cases_in_30d", "deaths_in_30d", "new_countries_next_week"];
     const graphs = ["transmission_rate", "mortality_rate"];
     const text = ["geographic_spread", "peak_date", "estimated_duration_days"];
 
     const renderModelComponent = (model) => {
+        console.log(`Rendering model: ${model}`);
         if (numbers.includes(model)) {
             return (
-                <NumberCard key={model} name={model} />
+                <NumberCard key={model} name={model} value={model} />
             );
         } else if (graphs.includes(model)) {
             return (
-                <GraphCard key={model} name={model} />
+                <GraphCard key={model} name={model} value={model} />
             );
         } else if (text.includes(model)) {
             return (
-                <TextCard key={model} name={model} />
+                <TextCard key={model} name={model} value={model} />
             );
         } else {
             return null;
@@ -45,7 +46,9 @@ const AnalyzeIt = () => {
 
                 {/* Main Content */}
                 <div className="flex flex-wrap p-4 overflow-y-auto">
-                    {selectedModels.map((model) => renderModelComponent(model))}
+                    {selectedModels.map((model) => (
+                        renderModelComponent(model)
+                    ))}
                 </div>
             </div>
         </div>
