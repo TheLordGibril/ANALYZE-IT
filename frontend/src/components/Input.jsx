@@ -219,7 +219,6 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
         "Yemen, Rep.",
         "Zambia",
         "Zimbabwe"]
-
     const handleSetSelectedModels = (model) => {
         setSelectedModels((prev) =>
             prev.includes(model)
@@ -234,11 +233,11 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
             ...prev,
             [name]: value,
         }));
-        console.log(parameters)
     };
 
     return (
-        <div className="w-64 bg-gray-100 text-black p-4 space-y-4">
+        <div className="w-64 bg-gray-100 text-black p-4 space-y-4 overflow-y-auto">
+
             <div>
                 <label className="block text-sm font-medium">Pays</label>
                 <select
@@ -286,7 +285,25 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
 
             <div>
                 <h4 className="text-sm font-semibold mt-4 mb-2">Models</h4>
-                <div className="space-y-1">
+
+
+                <div className="flex items-center space-x-2 mb-2">
+                    <input
+                        type="checkbox"
+                        checked={selectedModels.length === allModels.length}
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                setSelectedModels(allModels);
+                            } else {
+                                setSelectedModels([]);
+                            }
+                        }}
+                    />
+                    <span className="text-sm font-medium">Tout sélectionner</span>
+                </div>
+
+
+                <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
                     {allModels.map((model) => (
                         <div key={model} className="flex items-center space-x-2">
                             <input
