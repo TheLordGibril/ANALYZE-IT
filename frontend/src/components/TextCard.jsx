@@ -6,11 +6,16 @@ export default function TextCard({ name, value, parameters }) {
     if (loading) return <p>Chargement...</p>;
     if (error) return <p>Erreur: {error.message}</p>;
     return (
-        <div className="text-black">
-            <p>{name}</p>
-            {console.log("Prediction data:", prediction)}
-            {console.log(loading)}
-            <p>{prediction && prediction.predictions[name]}</p>
+        <div className="w-40 h-40 bg-white rounded-2xl shadow-lg p-6 flex flex-col justify-center items-center transition-transform hover:scale-[1.02] hover:shadow-xl text-center space-y-2">
+            <p className="text-gray-700 text-sm">{name}</p>
+            <p className="text-3xl font-bold text-blue-600">
+                {prediction?.predictions?.[name].map((elt, index) => (
+                    <span key={index}>
+                        {elt}
+                        {index < prediction.predictions[name].length - 1 ? ', ' : ''}
+                    </span>
+                ))}
+            </p>
         </div>
     )
 }
