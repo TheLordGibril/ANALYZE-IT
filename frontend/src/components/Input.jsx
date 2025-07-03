@@ -1,9 +1,9 @@
 export default function Input({ selectedModels, setSelectedModels, parameters, setParameters }) {
     const allModels = [
-        "total_cases", "total_deaths", "new_cases", "new_deaths",
-        "transmission_rate", "mortality_rate", "geographic_spread",
+        "total_cases", "total_deaths",
         "peak_date", "estimated_duration_days", "cases_in_30d",
-        "deaths_in_30d", "new_countries_next_week"
+        "deaths_in_30d", "new_countries_next_week","new_cases", "new_deaths",
+        "transmission_rate", "mortality_rate", "geographic_spread"
     ];
 
     const allPays = [

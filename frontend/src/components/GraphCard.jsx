@@ -36,13 +36,17 @@ export default function GraphCard({ labels, dataPoints, label = "Dataset" }) {
             tooltip: { mode: 'index', intersect: false },
         },
         scales: {
-            x: { grid: { display: false } },
+            x: {
+                grid: { display: false },
+                ticks: { display: false },
+            },
+
             y: { beginAtZero: true },
         }
     }
 
     return (
-        <div style={{ width: 300, height: 200 }}>
+        <div style={{ width: 400, height: 200 }}>
             <Line data={data} options={options} />
         </div>
     )
