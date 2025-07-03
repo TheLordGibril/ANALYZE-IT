@@ -60,8 +60,10 @@ def model_new_deaths(country_id, virus_id, date_start, nb_days):
     d = datetime.strptime(date_start, "%Y-%m-%d")
     preds = []
     for i in range(nb_days):
-        day_of_year = (d + timedelta(days=i)).timetuple().tm_yday
-        X = np.array([[country_id, virus_id, day_of_year]])
+        date_i = d + timedelta(days=i)
+        year = date_i.year
+        day_of_year = date_i.timetuple().tm_yday
+        X = np.array([[country_id, virus_id, year, day_of_year]])
         preds.append(int(new_deaths_model.predict(X)[0]))
     return preds
 
@@ -70,8 +72,10 @@ def model_transmission_rate(country_id, virus_id, date_start, nb_days):
     d = datetime.strptime(date_start, "%Y-%m-%d")
     preds = []
     for i in range(nb_days):
-        day_of_year = (d + timedelta(days=i)).timetuple().tm_yday
-        X = np.array([[country_id, virus_id, day_of_year]])
+        date_i = d + timedelta(days=i)
+        year = date_i.year
+        day_of_year = date_i.timetuple().tm_yday
+        X = np.array([[country_id, virus_id, year, day_of_year]])
         preds.append(float(infection_rate_model.predict(X)[0]))
     return preds
 
@@ -80,23 +84,27 @@ def model_mortality_rate(country_id, virus_id, date_start, nb_days):
     d = datetime.strptime(date_start, "%Y-%m-%d")
     preds = []
     for i in range(nb_days):
-        day_of_year = (d + timedelta(days=i)).timetuple().tm_yday
-        X = np.array([[country_id, virus_id, day_of_year]])
+        date_i = d + timedelta(days=i)
+        year = date_i.year
+        day_of_year = date_i.timetuple().tm_yday
+        X = np.array([[country_id, virus_id, year, day_of_year]])
         preds.append(float(mortality_rate_model.predict(X)[0]))
     return preds
 
 
 def model_total_cases(country_id, virus_id, date):
     d = datetime.strptime(date, "%Y-%m-%d")
+    year = d.year
     day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, day_of_year]])
+    X = np.array([[country_id, virus_id, year, day_of_year]])
     return int(total_cases_model.predict(X)[0])
 
 
 def model_total_deaths(country_id, virus_id, date):
     d = datetime.strptime(date, "%Y-%m-%d")
+    year = d.year
     day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, day_of_year]])
+    X = np.array([[country_id, virus_id, year, day_of_year]])
     return int(total_deaths_model.predict(X)[0])
 
 
@@ -112,33 +120,36 @@ def model_geographic_spread(country_id, virus_id, date_start, nb_days):
 
 def model_peak_date(country_id, virus_id, date_start):
     d = datetime.strptime(date_start, "%Y-%m-%d")
+    year = d.year
     day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, day_of_year]])
+    X = np.array([[country_id, virus_id, year, day_of_year]])
     # Le modèle prédit le jour de l'année du pic
     peak_day_of_year = int(peak_date_model.predict(X)[0])
-    year = d.year
     peak_date = datetime(year, 1, 1) + timedelta(days=peak_day_of_year - 1)
     return peak_date.strftime("%Y-%m-%d")
 
 
 def model_estimated_duration(country_id, virus_id, date_start):
     d = datetime.strptime(date_start, "%Y-%m-%d")
+    year = d.year
     day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, day_of_year]])
+    X = np.array([[country_id, virus_id, year, day_of_year]])
     return int(estimated_duration_model.predict(X)[0])
 
 
 def model_cases_in_30d(country_id, virus_id, date_start):
     d = datetime.strptime(date_start, "%Y-%m-%d")
+    year = d.year
     day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, day_of_year]])
+    X = np.array([[country_id, virus_id, year, day_of_year]])
     return int(cases_in_30d_model.predict(X)[0])
 
 
 def model_deaths_in_30d(country_id, virus_id, date_start):
     d = datetime.strptime(date_start, "%Y-%m-%d")
+    year = d.year
     day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, day_of_year]])
+    X = np.array([[country_id, virus_id, year, day_of_year]])
     return int(deaths_in_30d_model.predict(X)[0])
 
 

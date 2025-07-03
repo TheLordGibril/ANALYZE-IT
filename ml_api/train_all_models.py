@@ -100,7 +100,7 @@ def main():
         .reset_index(name='peak_day_of_year')
     )
     df_peak = pd.merge(df, peak_days, on=['id_pays', 'id_virus', 'year'])
-    X_peak = df_peak[["id_pays", "id_virus", "day_of_year"]].values
+    X_peak = df_peak[["id_pays", "id_virus", "year", "day_of_year"]].values
     y_peak = df_peak["peak_day_of_year"].values
     train_and_save_model(X_peak, y_peak, "models/peak_date_model.joblib")
 
@@ -110,10 +110,10 @@ def main():
         .agg(['min', 'max'])
         .reset_index()
     )
-
     duration['duration'] = duration['max'] - duration['min'] + 1
     df_duration = pd.merge(df, duration, on=['id_pays', 'id_virus', 'year'])
-    X_duration = df_duration[["id_pays", "id_virus", "day_of_year"]].values
+    X_duration = df_duration[["id_pays",
+                              "id_virus", "year", "day_of_year"]].values
     y_duration = df_duration["duration"].values
     train_and_save_model(X_duration, y_duration,
                          "models/estimated_duration_model.joblib")
