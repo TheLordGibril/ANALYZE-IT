@@ -32,6 +32,7 @@ query Query {
         }
                 `,))
       .then((data) => {
+        console.log(data)
         if (data.errors) {
           throw new Error(data.errors[0].message);
         }
