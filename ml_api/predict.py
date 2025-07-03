@@ -172,10 +172,6 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
 
         nb_days = (d_end - d_start).days + 1
 
-        # Limite de sécurité pour éviter les périodes trop longues
-        if nb_days > 730:  # 2 ans maximum
-            raise ValueError("La période de prédiction ne peut pas dépasser 2 ans")
-
         # Récupération des IDs
         country_id = get_country_id(country)
         virus_id = get_virus_id(virus)
