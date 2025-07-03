@@ -46,7 +46,7 @@ export default function GraphCard({ labels, dataPoints, label = "Dataset" }) {
     }
 
     return (
-        <div style={{ width: 400, height: 200 }}>
+        <div style={{ width: 1200, height: 600 }}>
             <Line data={data} options={options} />
         </div>
     )
