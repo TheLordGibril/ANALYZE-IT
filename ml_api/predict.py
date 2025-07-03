@@ -139,8 +139,7 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
     country_id = get_country_id(country)
     virus_id = get_virus_id(virus)
     d_start = datetime.strptime(date_start, "%Y-%m-%d")
-    d_end = datetime.strptime(date_end, "%Y-%m-%d")
-    nb_days = (d_end - d_start).days + 1
+    nb_days = (datetime.strptime(date_end, "%Y-%m-%d") - d_start).days + 1
 
     new_cases = model_new_cases(country_id, virus_id, date_start, nb_days)
     new_deaths = model_new_deaths(country_id, virus_id, date_start, nb_days)
@@ -160,16 +159,24 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
     new_countries_next_week = model_new_countries_next_week(
         country_id, virus_id, date_start)
 
+    dates = [(d_start + timedelta(days=i)).strftime("%Y-%m-%d")
+             for i in range(nb_days)]
+
+    def to_date_dict(values):
+        return {date: value for date, value in zip(dates, values)}
+
     return {
         "country": country,
         "virus": virus,
+        "date_start": date_start,
+        "date_end": date_end,
         "predictions": {
             "total_cases": total_cases,
             "total_deaths": total_deaths,
-            "new_cases": new_cases,
-            "new_deaths": new_deaths,
-            "transmission_rate": transmission_rate,
-            "mortality_rate": mortality_rate,
+            "new_cases": to_date_dict(new_cases),
+            "new_deaths": to_date_dict(new_deaths),
+            "transmission_rate": to_date_dict(transmission_rate),
+            "mortality_rate": to_date_dict(mortality_rate),
             "geographic_spread": geographic_spread,
             "peak_date": peak_date,
             "estimated_duration_days": estimated_duration_days,
