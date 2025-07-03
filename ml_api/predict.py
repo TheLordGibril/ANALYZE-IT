@@ -45,6 +45,22 @@ new_countries_next_week_model = joblib.load(
     "models/new_countries_next_week_model.joblib")
 
 
+def model_total_cases(country_id, virus_id, date):
+    d = datetime.strptime(date, "%Y-%m-%d")
+    year = d.year
+    day_of_year = d.timetuple().tm_yday
+    X = np.array([[country_id, virus_id, year, day_of_year]])
+    return int(total_cases_model.predict(X)[0])
+
+
+def model_total_deaths(country_id, virus_id, date):
+    d = datetime.strptime(date, "%Y-%m-%d")
+    year = d.year
+    day_of_year = d.timetuple().tm_yday
+    X = np.array([[country_id, virus_id, year, day_of_year]])
+    return int(total_deaths_model.predict(X)[0])
+
+
 def model_new_cases(country_id, virus_id, date_start, nb_days):
     d = datetime.strptime(date_start, "%Y-%m-%d")
     preds = []
@@ -92,22 +108,6 @@ def model_mortality_rate(country_id, virus_id, date_start, nb_days):
     return preds
 
 
-def model_total_cases(country_id, virus_id, date):
-    d = datetime.strptime(date, "%Y-%m-%d")
-    year = d.year
-    day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, year, day_of_year]])
-    return int(total_cases_model.predict(X)[0])
-
-
-def model_total_deaths(country_id, virus_id, date):
-    d = datetime.strptime(date, "%Y-%m-%d")
-    year = d.year
-    day_of_year = d.timetuple().tm_yday
-    X = np.array([[country_id, virus_id, year, day_of_year]])
-    return int(total_deaths_model.predict(X)[0])
-
-
 def model_geographic_spread(country_id, virus_id, date_start, nb_days):
     d = datetime.strptime(date_start, "%Y-%m-%d")
     preds = []
@@ -123,7 +123,6 @@ def model_peak_date(country_id, virus_id, date_start):
     year = d.year
     day_of_year = d.timetuple().tm_yday
     X = np.array([[country_id, virus_id, year, day_of_year]])
-    # Le modèle prédit le jour de l'année du pic
     peak_day_of_year = int(peak_date_model.predict(X)[0])
     peak_date = datetime(year, 1, 1) + timedelta(days=peak_day_of_year - 1)
     return peak_date.strftime("%Y-%m-%d")
