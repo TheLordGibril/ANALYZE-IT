@@ -35,6 +35,14 @@ infection_rate_model = joblib.load("models/infection_rate_model.joblib")
 mortality_rate_model = joblib.load("models/mortality_rate_model.joblib")
 total_cases_model = joblib.load("models/total_cases_model.joblib")
 total_deaths_model = joblib.load("models/total_deaths_model.joblib")
+peak_date_model = joblib.load("models/peak_date_model.joblib")
+estimated_duration_model = joblib.load(
+    "models/estimated_duration_model.joblib")
+cases_in_30d_model = joblib.load("models/cases_in_30d_model.joblib")
+deaths_in_30d_model = joblib.load("models/deaths_in_30d_model.joblib")
+geographic_spread_model = joblib.load("models/geographic_spread_model.joblib")
+new_countries_next_week_model = joblib.load(
+    "models/new_countries_next_week_model.joblib")
 
 
 def model_new_cases(country_id, virus_id, date_start, nb_days):
@@ -92,44 +100,58 @@ def model_total_deaths(country_id, virus_id, date):
 
 
 def model_geographic_spread(country_id, virus_id, date_start, nb_days):
-    # À remplacer par un vrai modèle multilabel
-    all_countries = ["France", "Italy", "Spain", "Germany", "UK"]
-    # Exemple : on retourne 2 pays au hasard
-    import random
-    return random.sample(all_countries, k=2)
+    d = datetime.strptime(date_start, "%Y-%m-%d")
+    preds = []
+    for i in range(nb_days):
+        year = (d + timedelta(days=i)).year
+        X = np.array([[virus_id, year]])
+        preds.append(int(geographic_spread_model.predict(X)[0]))
+    return preds
 
 
 def model_peak_date(country_id, virus_id, date_start):
-    # À remplacer par un vrai modèle de régression
     d = datetime.strptime(date_start, "%Y-%m-%d")
-    # Mock : pic dans 15 à 40 jours
-    import random
-    peak = d + timedelta(days=random.randint(15, 40))
-    return peak.strftime("%Y-%m-%d")
+    day_of_year = d.timetuple().tm_yday
+    X = np.array([[country_id, virus_id, day_of_year]])
+    # Le modèle prédit le jour de l'année du pic
+    peak_day_of_year = int(peak_date_model.predict(X)[0])
+    year = d.year
+    peak_date = datetime(year, 1, 1) + timedelta(days=peak_day_of_year - 1)
+    return peak_date.strftime("%Y-%m-%d")
 
 
 def model_estimated_duration(country_id, virus_id, date_start):
-    # À remplacer par un vrai modèle de régression
-    import random
-    return random.randint(60, 180)
+    d = datetime.strptime(date_start, "%Y-%m-%d")
+    day_of_year = d.timetuple().tm_yday
+    X = np.array([[country_id, virus_id, day_of_year]])
+    return int(estimated_duration_model.predict(X)[0])
 
 
 def model_cases_in_30d(country_id, virus_id, date_start):
-    # À remplacer par un vrai modèle de régression
-    import random
-    return random.randint(10000, 500000)
+    d = datetime.strptime(date_start, "%Y-%m-%d")
+    day_of_year = d.timetuple().tm_yday
+    X = np.array([[country_id, virus_id, day_of_year]])
+    return int(cases_in_30d_model.predict(X)[0])
 
 
 def model_deaths_in_30d(country_id, virus_id, date_start):
-    # À remplacer par un vrai modèle de régression
-    import random
-    return random.randint(500, 20000)
+    d = datetime.strptime(date_start, "%Y-%m-%d")
+    day_of_year = d.timetuple().tm_yday
+    X = np.array([[country_id, virus_id, day_of_year]])
+    return int(deaths_in_30d_model.predict(X)[0])
 
 
-def model_new_countries_next_week(country_id, virus_id, date_start):
-    # À remplacer par un vrai modèle de régression ou classification
-    import random
-    return random.randint(0, 5)
+def model_new_countries_next_week(country_id, virus_id, date_end):
+    d = datetime.strptime(date_end, "%Y-%m-%d")
+    year = d.year
+    week = d.isocalendar()[1] + 1
+    if week > 52:
+        week = 1
+        year += 1
+    X = np.array([[virus_id, year, week]])
+    value = int(new_countries_next_week_model.predict(X)[0])
+    value = max(0, value)
+    return value
 
 
 def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
@@ -157,7 +179,7 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
     cases_in_30d = model_cases_in_30d(country_id, virus_id, date_start)
     deaths_in_30d = model_deaths_in_30d(country_id, virus_id, date_start)
     new_countries_next_week = model_new_countries_next_week(
-        country_id, virus_id, date_start)
+        country_id, virus_id, date_end)
 
     dates = [(d_start + timedelta(days=i)).strftime("%Y-%m-%d")
              for i in range(nb_days)]
@@ -177,7 +199,7 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
             "new_deaths": to_date_dict(new_deaths),
             "transmission_rate": to_date_dict(transmission_rate),
             "mortality_rate": to_date_dict(mortality_rate),
-            "geographic_spread": geographic_spread,
+            "geographic_spread": to_date_dict(geographic_spread),
             "peak_date": peak_date,
             "estimated_duration_days": estimated_duration_days,
             "cases_in_30d": cases_in_30d,

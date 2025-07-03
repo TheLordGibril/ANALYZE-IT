@@ -89,6 +89,7 @@ def main():
     train_and_save_model(X_cases, y_total_deaths,
                          "models/total_deaths_model.joblib")
 
+    df["date"] = pd.to_datetime(df["date"])
     df['year'] = df['date'].dt.year
     peak_days = (
         df.groupby(['id_pays', 'id_virus', 'year'])[
@@ -153,8 +154,22 @@ def main():
     y_geo = geo_spread["num_countries_affected"].values
     train_and_save_model(X_geo, y_geo, "models/geographic_spread_model.joblib")
 
+    df = df.sort_values(['id_virus', 'id_pays', 'date'])
+    df['first_case'] = df.groupby(['id_virus', 'id_pays'])[
+        'date'].transform('min')
+    df['week'] = df['date'].dt.isocalendar().week
+    new_countries_week = (
+        df[df['date'] == df['first_case']]
+        .groupby(['id_virus', 'year', 'week'])['id_pays']
+        .count()
+        .reset_index(name='new_countries')
+    )
+    X_new_countries = new_countries_week[["id_virus", "year", "week"]].values
+    y_new_countries = new_countries_week["new_countries"].values
+    train_and_save_model(X_new_countries, y_new_countries,
+                         "models/new_countries_next_week_model.joblib")
 
-print("Tous les modèles sont entraînés et sauvegardés.")
+    print("Tous les modèles sont entraînés et sauvegardés.")
 
 
 if __name__ == "__main__":
