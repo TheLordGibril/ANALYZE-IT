@@ -14,8 +14,8 @@ const AnalyzeIt = () => {
   });
 
   const numbers = ["total_cases", "total_deaths", "cases_in_30d", "deaths_in_30d", "new_countries_next_week", "estimated_duration_days"];
-  const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths",];
-  const text = ["geographic_spread", "peak_date"];
+  const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths", "geographic_spread"];
+  const text = ["peak_date"];
 
   const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May']
   const values = [10, 20, 15, 30, 25]
