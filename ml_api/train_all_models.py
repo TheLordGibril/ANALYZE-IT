@@ -64,6 +64,7 @@ def main():
     df = fetch_training_data(session)
     df = prepare_features(df)
 
+    df["date"] = pd.to_datetime(df["date"])
     df["year"] = df["date"].dt.year
     features = ["id_pays", "id_virus", "year", "day_of_year"]
 
