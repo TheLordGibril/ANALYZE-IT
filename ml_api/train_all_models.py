@@ -64,7 +64,8 @@ def main():
     df = fetch_training_data(session)
     df = prepare_features(df)
 
-    features = ["id_pays", "id_virus", "day_of_year"]
+    df["year"] = df["date"].dt.year
+    features = ["id_pays", "id_virus", "year", "day_of_year"]
 
     X_cases = df[features].values
     y_cases = df["nouveaux_cas"].values

@@ -49,8 +49,9 @@ def model_new_cases(country_id, virus_id, date_start, nb_days):
     d = datetime.strptime(date_start, "%Y-%m-%d")
     preds = []
     for i in range(nb_days):
+        year = (d + timedelta(days=i)).year
         day_of_year = (d + timedelta(days=i)).timetuple().tm_yday
-        X = np.array([[country_id, virus_id, day_of_year]])
+        X = np.array([[country_id, virus_id, year, day_of_year]])
         preds.append(int(new_cases_model.predict(X)[0]))
     return preds
 
