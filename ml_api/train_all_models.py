@@ -6,7 +6,6 @@ import joblib
 import numpy as np
 from sklearn.linear_model import LinearRegression
 from config import config
-from xgboost import XGBRegressor
 
 # Redéfinition des modèles SQLAlchemy nécessaires
 Base = declarative_base()
@@ -53,18 +52,8 @@ def prepare_features(df):
     return df
 
 
-def train_and_save_model(X, y, model_path, use_xgb=False):
-    if use_xgb:
-        model = XGBRegressor(
-            n_estimators=100,
-            max_depth=5,
-            learning_rate=0.1,
-            objective="reg:squarederror",
-            random_state=42,
-            n_jobs=-1
-        )
-    else:
-        model = LinearRegression()
+def train_and_save_model(X, y, model_path):
+    model = LinearRegression()
     model.fit(X, y)
     joblib.dump(model, model_path)
     print(f"Modèle sauvegardé : {model_path}")
@@ -142,9 +131,9 @@ def main():
     y_cases_30d = df["cases_in_30d"].values
     y_deaths_30d = df["deaths_in_30d"].values
     train_and_save_model(X_30d, y_cases_30d,
-                         "models/cases_in_30d_model.joblib", use_xgb=True)
+                         "models/cases_in_30d_model.joblib")
     train_and_save_model(X_30d, y_deaths_30d,
-                         "models/deaths_in_30d_model.joblib", use_xgb=True)
+                         "models/deaths_in_30d_model.joblib")
 
     df['cases_in_7d'] = df.groupby(['id_pays', 'id_virus'])['nouveaux_cas'].transform(
         lambda x: x.rolling(window=7, min_periods=1).sum().shift(-6).fillna(0)

@@ -7,4 +7,3 @@ sqlalchemy
 scikit-learn
 dotenv
 psycopg2-binary
-xgboost

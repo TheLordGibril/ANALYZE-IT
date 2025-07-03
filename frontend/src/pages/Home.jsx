@@ -54,7 +54,7 @@ const AnalyzeIt = () => {
                 </div>
             ) : (
                 <div className="flex flex-1">
-                    <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} setParameters={setParameters} />
+                    <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} nsetParameters={setParameters} />
                     <div className="flex flex-wrap p-4 overflow-y-auto">
                         {selectedModels.map((model) => renderModelComponent(model))}
                     </div>

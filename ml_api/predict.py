@@ -108,7 +108,7 @@ def model_mortality_rate(country_id, virus_id, date_start, nb_days):
     return preds
 
 
-def model_geographic_spread(virus_id, date_start, nb_days):
+def model_geographic_spread(country_id, virus_id, date_start, nb_days):
     d = datetime.strptime(date_start, "%Y-%m-%d")
     preds = []
     for i in range(nb_days):
@@ -182,7 +182,8 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
         country_id, virus_id, date_start, nb_days)
     total_cases = model_total_cases(country_id, virus_id, date_end)
     total_deaths = model_total_deaths(country_id, virus_id, date_end)
-    geographic_spread = model_geographic_spread(virus_id, date_start, nb_days)
+    geographic_spread = model_geographic_spread(
+        country_id, virus_id, date_start, nb_days)
     peak_date = model_peak_date(country_id, virus_id, date_start)
     estimated_duration_days = model_estimated_duration(
         country_id, virus_id, date_start)
