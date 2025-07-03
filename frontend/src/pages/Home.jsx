@@ -15,8 +15,8 @@ const AnalyzeIt = () => {
     });
 
     const numbers = ["total_cases", "total_deaths", "cases_in_30d", "deaths_in_30d", "new_countries_next_week", "estimated_duration_days"];
-    const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths"];
-    const text = ["geographic_spread", "peak_date"];
+    const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths", "geographic_spread",];
+    const text = ["peak_date"];
 
     const { prediction, loading, error } = usePrediction({
         country: parameters.country,
@@ -72,7 +72,7 @@ const AnalyzeIt = () => {
                     <div className="flex flex-wrap p-4 overflow-y-auto">
                         {selectedModels.map((model) => renderModelComponent(model))}
                     </div>
-                        {/* <GraphCard labels={labels} dataPoints={values} label="Nouveaux cas" /> */}
+                    {/* <GraphCard labels={labels} dataPoints={values} label="Nouveaux cas" /> */}
                 </div>
             )}
         </div>
