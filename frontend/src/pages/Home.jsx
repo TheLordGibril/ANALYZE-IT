@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import Input from "../components/Input";
 import GraphCard from "../components/GraphCard";
 import NumberCard from "../components/NumberCard";
@@ -15,7 +15,7 @@ const AnalyzeIt = () => {
     });
 
     const numbers = ["total_cases", "total_deaths", "cases_in_30d", "deaths_in_30d", "new_countries_next_week", "estimated_duration_days"];
-    const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths", "geographic_spread",];
+    const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths", "geographic_spread"];
     const text = ["peak_date"];
 
     const { prediction, loading, error } = usePrediction({
@@ -25,24 +25,16 @@ const AnalyzeIt = () => {
         dateEnd: parameters.date_end
     });
 
-    const [newCases, setNewCases] = useState({});
-
-    useEffect(() => {
-        if (prediction?.predictions?.new_cases) {
-            setNewCases(prediction.predictions.new_cases);
-        } else {
-            setNewCases({});
-        }
-    }, [prediction]);
-
-    const labels = Object.keys(newCases);
-    const values = Object.values(newCases);
-
     const renderModelComponent = (model) => {
         if (numbers.includes(model)) {
             return <NumberCard key={model} name={model} value={model} parameters={parameters} />;
         } else if (graphs.includes(model)) {
-            return <GraphCard key={model} name={model} value={model} parameters={parameters} />;
+            const dataObj = prediction?.predictions?.[model] ?? {};
+            const labels = Object.keys(dataObj);
+            const dataPoints = Object.values(dataObj);
+            return (
+                <GraphCard key={model} labels={labels} dataPoints={dataPoints} label={model} />
+            );
         } else if (text.includes(model)) {
             return <TextCard key={model} name={model} value={model} parameters={parameters} />;
         } else {
@@ -62,17 +54,10 @@ const AnalyzeIt = () => {
                 </div>
             ) : (
                 <div className="flex flex-1">
-                    <Input
-                        selectedModels={selectedModels}
-                        setSelectedModels={setSelectedModels}
-                        parameters={parameters}
-                        setParameters={setParameters}
-                    />
-
+                    <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} nsetParameters={setParameters} />
                     <div className="flex flex-wrap p-4 overflow-y-auto">
                         {selectedModels.map((model) => renderModelComponent(model))}
                     </div>
-                    {/* <GraphCard labels={labels} dataPoints={values} label="Nouveaux cas" /> */}
                 </div>
             )}
         </div>

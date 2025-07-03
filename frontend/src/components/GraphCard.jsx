@@ -23,7 +23,7 @@ export default function GraphCard({ labels, dataPoints, label = "Dataset" }) {
                 backgroundColor: 'rgba(59, 130, 246, 0.2)',
                 tension: 0.3,
                 fill: true,
-                pointRadius: 4,
+                pointRadius: 0,
                 pointHoverRadius: 6,
             }
         ]
@@ -41,5 +41,9 @@ export default function GraphCard({ labels, dataPoints, label = "Dataset" }) {
         }
     }
 
-    return <Line data={data} options={options} />
+    return (
+        <div style={{ width: 300, height: 200 }}>
+            <Line data={data} options={options} />
+        </div>
+    )
 }
