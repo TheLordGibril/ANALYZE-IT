@@ -14,9 +14,15 @@ const AnalyzeIt = () => {
         date_end: "2021-03-01"
     });
 
+<<<<<<< HEAD
     const numbers = ["total_cases", "total_deaths", "cases_in_30d", "deaths_in_30d", "new_countries_next_week", "estimated_duration_days"];
     const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths"];
     const text = ["geographic_spread", "peak_date"];
+=======
+  const numbers = ["total_cases", "total_deaths", "cases_in_30d", "deaths_in_30d", "new_countries_next_week", "estimated_duration_days"];
+  const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths", "geographic_spread"];
+  const text = ["peak_date"];
+>>>>>>> dccdf8d3752f047194f50952972fb015eb3b4505
 
     const { prediction, loading, error } = usePrediction({
         country: parameters.country,
