@@ -53,6 +53,28 @@ def get_virus_id(virus_name):
             return result[0]
         raise ValueError(f"Virus inconnu: {virus_name}")
 
+def get_latest_data_date(country_id, virus_id):
+    try:
+        engine = create_engine(config.get_database_url())
+        meta = MetaData()
+        stats = Table('Statistiques_Journalieres', meta, autoload_with=engine)
+
+        with engine.connect() as conn:
+            query = select(stats.c.date).where(
+                and_(
+                    stats.c.id_pays == country_id,
+                    stats.c.id_virus == virus_id
+                )
+            ).order_by(stats.c.date.desc()).limit(1)
+
+            result = conn.execute(query).first()
+            if result:
+                return result[0]
+            else:
+                return None
+    except Exception as e:
+        logger.error(f"Erreur lors de la récupération de la dernière date: {e}")
+        return None
 
 def get_official_data(country_id, virus_id, date_start, date_end):
     try:
@@ -111,16 +133,24 @@ def get_official_data(country_id, virus_id, date_start, date_end):
         raise
 
 
-def get_dates_to_predict(all_dates, official_data):
-    today = datetime.now().date()
+def get_dates_to_predict(all_dates, country_id, virus_id):
+    latest_data_date = get_latest_data_date(country_id, virus_id)
 
-    # Filtrer pour ne garder que les dates futures qui n'ont pas de données officielles
+    if latest_data_date is None:
+        # Si aucune donnée n'existe, prédire toutes les dates
+        logger.info("Aucune donnée historique trouvée, prédiction de toutes les dates")
+        return all_dates
+
+    logger.info(f"Dernière date avec données officielles: {latest_data_date}")
+
+    # Filtrer pour ne garder que les dates postérieures à la dernière date en BDD
     dates_to_predict = []
     for date in all_dates:
         date_obj = datetime.strptime(date, "%Y-%m-%d").date()
-        if date_obj >= today and date not in official_data:
+        if date_obj > latest_data_date:
             dates_to_predict.append(date)
 
+    logger.info(f"Dates à prédire: {len(dates_to_predict)} dates")
     return dates_to_predict
 
 
@@ -183,7 +213,7 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
         official_raw_data = get_official_data(country_id, virus_id, date_start, date_end)
 
         # Identification des dates à prédire
-        dates_to_predict = get_dates_to_predict(all_dates, official_raw_data)
+        dates_to_predict = get_dates_to_predict(all_dates, country_id, virus_id)
 
         # Génération des prédictions uniquement pour les dates nécessaires
         prediction_raw_data = generate_predictions(country_id, virus_id, dates_to_predict)
@@ -229,12 +259,12 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
             all_mortality_rate = {}
             all_geographic_spread = {}
 
-            for date in all_dates:
-                if date in official_raw_data:
-                    all_new_cases[date] = official_raw_data[date]["nouveaux_cas"]
-                    all_new_deaths[date] = official_raw_data[date]["nouveaux_deces"]
-                    all_transmission_rate[date] = official_raw_data[date]["taux_infection"]
-                    all_mortality_rate[date] = official_raw_data[date]["taux_mortalite"]
+            for date in dates_to_predict:
+                if date in prediction_raw_data:
+                    all_new_cases[date] = prediction_raw_data[date]["nouveaux_cas"]
+                    all_new_deaths[date] = prediction_raw_data[date]["nouveaux_deces"]
+                    all_transmission_rate[date] = prediction_raw_data[date]["taux_infection"]
+                    all_mortality_rate[date] = prediction_raw_data[date]["taux_mortalite"]
                     d = datetime.strptime(date, "%Y-%m-%d")
                     X_geo = np.array([[virus_id, d.year]])
                     all_geographic_spread[date] = max(0, int(geographic_spread_model.predict(X_geo)[0]))
