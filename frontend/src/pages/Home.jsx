@@ -26,20 +26,28 @@ const AnalyzeIt = () => {
     });
 
     const officialData = prediction?.official ?? {};
-
-    console.log("prediction:", prediction);
-
-    console.log("officialData:", officialData);
+    const predictionData = prediction?.predictions ?? {};
 
     const renderModelComponent = (model) => {
         if (numbers.includes(model)) {
             const value = officialData[model];
             return <NumberCard key={model} name={model} value={value} parameters={parameters} />;
         } else if (graphs.includes(model)) {
-            const dataObj = officialData[model] ?? {};
-            const labels = Object.keys(dataObj);
-            const dataPoints = Object.values(dataObj);
-            return <GraphCard key={model} labels={labels} dataPoints={dataPoints} label={model} />;
+            const officialObj = officialData[model] ?? {};
+            const predictionObj = predictionData[model] ?? {};
+
+            const allDates = Array.from(new Set([...Object.keys(officialObj), ...Object.keys(predictionObj)])).sort();
+
+            const officialPoints = allDates.map(date => officialObj[date] ?? null);
+            const predictionPoints = allDates.map(date => predictionObj[date] ?? null);
+
+            return (
+                <GraphCard
+                    key={model}
+                    labels={allDates}
+                    datasets={[{ label: "Données officielles", data: officialPoints, color: "#3b82f6", dashed: false },
+                    { label: "Prédictions", data: predictionPoints, color: "#f59e0b", dashed: true }]} />
+            );
         } else if (text.includes(model)) {
             const value = officialData[model];
             return <TextCard key={model} name={model} value={value} parameters={parameters} />;
@@ -55,9 +63,7 @@ const AnalyzeIt = () => {
             </div>
 
             {loading ? (
-                <div className="flex justify-center items-center flex-grow text-black">
-                    Chargement...
-                </div>
+                <div className="flex justify-center items-center flex-grow text-black">Chargement...</div>
             ) : (
                 <div className="flex flex-1">
                     <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} setParameters={setParameters} />
