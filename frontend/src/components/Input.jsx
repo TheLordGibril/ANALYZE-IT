@@ -2,7 +2,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
     const allModels = [
         "total_cases", "total_deaths",
         "peak_date", "estimated_duration_days", "cases_in_30d",
-        "deaths_in_30d", "new_countries_next_week","new_cases", "new_deaths",
+        "deaths_in_30d", "new_countries_next_week", "new_cases", "new_deaths",
         "transmission_rate", "mortality_rate", "geographic_spread"
     ];
 
@@ -236,7 +236,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
     };
 
     return (
-        <div className="w-64 bg-gray-100 text-black p-4 space-y-4 overflow-y-auto">
+        <div className="w-64 bg-gray-100 text-black p-4 space-y-4">
 
             <div>
                 <label className="block text-sm font-medium">Pays</label>

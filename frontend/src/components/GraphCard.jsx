@@ -45,7 +45,7 @@ export default function GraphCard({ labels, datasets }) {
     }
 
     return (
-        <div style={{ width: 1200, height: 600 }}>
+        <div className="w-full">
             <Line data={data} options={options} />
         </div>
     )
