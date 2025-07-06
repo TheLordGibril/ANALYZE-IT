@@ -61,17 +61,18 @@ const AnalyzeIt = () => {
             <div className="bg-blue-600 p-2 flex justify-between items-center text-white">
                 <div>Analyze-it</div>
             </div>
-
-            {loading ? (
-                <div className="flex justify-center items-center flex-grow text-black">Chargement...</div>
-            ) : (
-                <div className="flex flex-1">
-                    <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} setParameters={setParameters} />
-                    <div className="flex flex-wrap p-4 overflow-y-auto">
-                        {selectedModels.map((model) => renderModelComponent(model))}
-                    </div>
+            <div className="flex flex-1">
+                <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} setParameters={setParameters} />
+                <div className="flex flex-wrap p-4 overflow-y-auto w-full">
+                    {loading ? (
+                        <div className="flex justify-center items-center w-full h-96 text-blue-600 text-xl font-bold animate-pulse">
+                            Chargement...
+                        </div>
+                    ) : (
+                        selectedModels.map((model) => renderModelComponent(model))
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 };
