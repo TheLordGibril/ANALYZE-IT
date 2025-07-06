@@ -25,18 +25,32 @@ const AnalyzeIt = () => {
         dateEnd: parameters.date_end
     });
 
+    const officialData = prediction?.official ?? {};
+    const predictionData = prediction?.predictions ?? {};
+
     const renderModelComponent = (model) => {
         if (numbers.includes(model)) {
-            return <NumberCard key={model} name={model} value={model} parameters={parameters} />;
+            const value = officialData[model];
+            return <NumberCard key={model} name={model} value={value} parameters={parameters} />;
         } else if (graphs.includes(model)) {
-            const dataObj = prediction?.predictions?.[model] ?? {};
-            const labels = Object.keys(dataObj);
-            const dataPoints = Object.values(dataObj);
+            const officialObj = officialData[model] ?? {};
+            const predictionObj = predictionData[model] ?? {};
+
+            const allDates = Array.from(new Set([...Object.keys(officialObj), ...Object.keys(predictionObj)])).sort();
+
+            const officialPoints = allDates.map(date => officialObj[date] ?? null);
+            const predictionPoints = allDates.map(date => predictionObj[date] ?? null);
+
             return (
-                <GraphCard key={model} labels={labels} dataPoints={dataPoints} label={model} />
+                <GraphCard
+                    key={model}
+                    labels={allDates}
+                    datasets={[{ label: "Données officielles", data: officialPoints, color: "#3b82f6", dashed: false },
+                    { label: "Prédictions", data: predictionPoints, color: "#f59e0b", dashed: true }]} />
             );
         } else if (text.includes(model)) {
-            return <TextCard key={model} name={model} value={model} parameters={parameters} />;
+            const value = officialData[model];
+            return <TextCard key={model} name={model} value={value} parameters={parameters} />;
         } else {
             return null;
         }
@@ -49,12 +63,10 @@ const AnalyzeIt = () => {
             </div>
 
             {loading ? (
-                <div className="flex justify-center items-center flex-grow text-black">
-                    Chargement...
-                </div>
+                <div className="flex justify-center items-center flex-grow text-black">Chargement...</div>
             ) : (
                 <div className="flex flex-1">
-                    <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} nsetParameters={setParameters} />
+                    <Input selectedModels={selectedModels} setSelectedModels={setSelectedModels} parameters={parameters} setParameters={setParameters} />
                     <div className="flex flex-wrap p-4 overflow-y-auto">
                         {selectedModels.map((model) => renderModelComponent(model))}
                     </div>
