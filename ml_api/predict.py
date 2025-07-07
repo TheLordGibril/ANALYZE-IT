@@ -219,7 +219,7 @@ def moving_average(data_dict, window_size=7):
     return dict(zip(dates, smoothed))
 
 
-def lissage_officiel_prediction(official_dict, pred_dict, window_size=7):
+def lissage_officiel_prediction(official_dict, pred_dict, window_size=7, arrondi=False):
     # Fusionne les deux dicts (dates triées)
     all_dates = sorted(
         set(list(official_dict.keys()) + list(pred_dict.keys())))
@@ -241,10 +241,13 @@ def lissage_officiel_prediction(official_dict, pred_dict, window_size=7):
     liss_off = {}
     liss_pred = {}
     for i, date in enumerate(all_dates):
+        value = smoothed[i]
+        if arrondi:
+            value = int(round(value))
         if date in official_dict:
-            liss_off[date] = float(smoothed[i])
+            liss_off[date] = value
         if date in pred_dict:
-            liss_pred[date] = float(smoothed[i])
+            liss_pred[date] = value
     return liss_off, liss_pred
 
 
@@ -348,9 +351,9 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
 
             # Lissage fusionné puis séparation
             liss_new_cases_off, liss_new_cases_pred = lissage_officiel_prediction(
-                dict_new_cases_off, all_new_cases)
+                dict_new_cases_off, all_new_cases, arrondi=True)
             liss_new_deaths_off, liss_new_deaths_pred = lissage_officiel_prediction(
-                dict_new_deaths_off, all_new_deaths)
+                dict_new_deaths_off, all_new_deaths, arrondi=True)
             liss_transmission_off, liss_transmission_pred = lissage_officiel_prediction(
                 dict_transmission_off, all_transmission_rate)
             liss_mortality_off, liss_mortality_pred = lissage_officiel_prediction(
