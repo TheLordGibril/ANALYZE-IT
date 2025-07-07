@@ -1,4 +1,3 @@
-import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
@@ -8,7 +7,6 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.preprocessing import StandardScaler
 import joblib
 import json
-from datetime import datetime
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -35,30 +33,30 @@ class ModelComparison:
         self.results = {}
         self.best_models = {}
 
-    def prepare_data(self, X, y, test_size=0.2, scale_features=False):
+    def prepare_data(self, x, y, test_size=0.2, scale_features=False):
         """Prépare les données pour l'entraînement"""
         # Division train/test
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=test_size, random_state=42
+        x_train, x_test, y_train, y_test = train_test_split(
+            x, y, test_size=test_size, random_state=42
         )
 
         # Normalisation optionnelle (recommandée pour certains algorithmes)
         if scale_features:
             scaler = StandardScaler()
-            X_train_scaled = scaler.fit_transform(X_train)
-            X_test_scaled = scaler.transform(X_test)
-            return X_train_scaled, X_test_scaled, y_train, y_test, scaler
+            x_train_scaled = scaler.fit_transform(x_train)
+            x_test_scaled = scaler.transform(x_test)
+            return x_train_scaled, x_test_scaled, y_train, y_test, scaler
 
-        return X_train, X_test, y_train, y_test, None
+        return x_train, x_test, y_train, y_test, None
 
-    def evaluate_model(self, model, X_train, X_test, y_train, y_test, model_name):
+    def evaluate_model(self, model, x_train, x_test, y_train, y_test, model_name):
         """Évalue un modèle et retourne les métriques"""
         # Entraînement
-        model.fit(X_train, y_train)
+        model.fit(x_train, y_train)
 
         # Prédictions
-        y_pred_train = model.predict(X_train)
-        y_pred_test = model.predict(X_test)
+        y_pred_train = model.predict(x_train)
+        y_pred_test = model.predict(x_test)
 
         # Métriques sur l'ensemble de test
         mse = mean_squared_error(y_test, y_pred_test)
@@ -71,7 +69,8 @@ class ModelComparison:
         r2_train = r2_score(y_train, y_pred_train)
 
         # Validation croisée
-        cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='r2')
+        cv_scores = cross_val_score(
+            model, x_train, y_train, cv=5, scoring='r2')
 
         metrics = {
             'model_name': model_name,
@@ -79,6 +78,7 @@ class ModelComparison:
             'test_rmse': rmse,
             'test_mae': mae,
             'test_r2': r2,
+            'mse_train': mse_train,
             'train_r2': r2_train,
             'cv_mean_r2': cv_scores.mean(),
             'cv_std_r2': cv_scores.std(),
@@ -87,12 +87,12 @@ class ModelComparison:
 
         return metrics, model
 
-    def compare_algorithms(self, X, y, model_type_name="Generic"):
+    def compare_algorithms(self, x, y, model_type_name="Generic"):
         """Compare tous les algorithmes sur un jeu de données"""
         print(f"\n🔍 Comparaison des algorithmes pour : {model_type_name}")
         print("=" * 60)
 
-        X_train, X_test, y_train, y_test, scaler = self.prepare_data(X, y)
+        x_train, x_test, y_train, y_test, scaler = self.prepare_data(x, y)
 
         comparison_results = {}
 
@@ -101,7 +101,7 @@ class ModelComparison:
 
             try:
                 metrics, trained_model = self.evaluate_model(
-                    algorithm, X_train, X_test, y_train, y_test, name
+                    algorithm, x_train, x_test, y_train, y_test, name
                 )
 
                 comparison_results[name] = {
@@ -114,10 +114,11 @@ class ModelComparison:
                 print(f"   R² Score: {metrics['test_r2']:.4f}")
                 print(f"   RMSE: {metrics['test_rmse']:.4f}")
                 print(f"   MAE: {metrics['test_mae']:.4f}")
-                print(f"   CV R² (moyenne): {metrics['cv_mean_r2']:.4f} (±{metrics['cv_std_r2']:.4f})")
+                print(
+                    f"   CV R² (moyenne): {metrics['cv_mean_r2']:.4f} (±{metrics['cv_std_r2']:.4f})")
 
                 if metrics['overfitting_indicator'] > 0.1:
-                    print(f"   ⚠️  Possible overfitting détecté!")
+                    print("   ⚠️  Possible overfitting détecté!")
 
             except Exception as e:
                 print(f"   ❌ Erreur lors de l'entraînement: {str(e)}")
@@ -129,7 +130,8 @@ class ModelComparison:
                                   key=lambda x: comparison_results[x]['metrics']['test_r2'])
 
             print(f"\n🏆 Meilleur modèle: {best_model_name}")
-            print(f"   R² Score: {comparison_results[best_model_name]['metrics']['test_r2']:.4f}")
+            print(
+                f"   R² Score: {comparison_results[best_model_name]['metrics']['test_r2']:.4f}")
 
             self.results[model_type_name] = comparison_results
             self.best_models[model_type_name] = {
@@ -152,7 +154,8 @@ class ModelComparison:
             # Sauvegarde aussi les métriques
             metrics_path = save_path.replace('.joblib', '_metrics.json')
             with open(metrics_path, 'w') as f:
-                json.dump(self.best_models[model_type_name]['metrics'], f, indent=2)
+                json.dump(
+                    self.best_models[model_type_name]['metrics'], f, indent=2)
 
             return True
         return False
@@ -172,7 +175,8 @@ class ModelComparison:
             print("-" * 40)
 
             # Tableau des résultats
-            print(f"{'Algorithme':<20} {'R² Score':<10} {'RMSE':<10} {'MAE':<10} {'CV R²':<10}")
+            print(
+                f"{'Algorithme':<20} {'R² Score':<10} {'RMSE':<10} {'MAE':<10} {'CV R²':<10}")
             print("-" * 70)
 
             for algo_name, result in results.items():
@@ -189,28 +193,3 @@ class ModelComparison:
 
             if best['metrics']['test_r2'] < 0.5:
                 print("⚠️  Attention: Score R² faible - considérer plus de features")
-
-
-# Exemple d'utilisation
-def example_usage():
-    """Exemple d'utilisation de la classe ModelComparison"""
-
-    # Données d'exemple (remplacez par vos vraies données)
-    X_example = np.random.rand(1000, 4)  # 4 features
-    y_example = np.random.rand(1000)  # Target
-
-    # Initialisation
-    comparator = ModelComparison()
-
-    # Comparaison des algorithmes
-    results = comparator.compare_algorithms(X_example, y_example, "New Cases")
-
-    # Sauvegarde du meilleur modèle
-    comparator.save_best_model("New Cases", "models/best_new_cases_model.joblib")
-
-    # Génération du rapport
-    comparator.generate_comparison_report()
-
-
-if __name__ == "__main__":
-    example_usage()
