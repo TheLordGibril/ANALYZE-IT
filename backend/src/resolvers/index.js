@@ -7,22 +7,17 @@ import { generateToken, requireAuth } from "../utils/auth.js";
 
 const resolvers = {
   Query: {
-    // Résolveur pour prédiction de pandémie
     predictPandemic: async (_, { country, virus, date_start, date_end }) => {
       try {
-        const response = await axios.get(
-          `http://127.0.0.1:8000/predict`,
-          {
-            params: { country, virus, date_start, date_end }
-          }
-        );
+        const response = await axios.get(`http://127.0.0.1:8000/predict`, {
+          params: { country, virus, date_start, date_end },
+        });
         return response.data;
       } catch (error) {
         console.error("Erreur lors de l'appel à l'API ML:", error.message);
         throw new Error("Erreur API ML");
       }
     },
-    // Résolveurs pour Pays
     pays: async (_, { id_pays }, { user }) => {
       requireAuth(user);
 
@@ -34,7 +29,6 @@ const resolvers = {
       return await prisma.pays.findMany();
     },
 
-    // Résolveurs pour Virus
     virus: async (_, { id_virus }) => {
       return await prisma.virus.findUnique({
         where: { id_virus: parseInt(id_virus) },
@@ -44,7 +38,6 @@ const resolvers = {
       return await prisma.virus.findMany();
     },
 
-    // Résolveurs pour Saisons
     saison: async (_, { id_saison }) => {
       return await prisma.saisons.findUnique({
         where: { id_saison: parseInt(id_saison) },
@@ -54,7 +47,6 @@ const resolvers = {
       return await prisma.saisons.findMany();
     },
 
-    // Résolveurs pour Statistiques
     statistique: async (_, { id_stat }) => {
       return await prisma.statistiquesJournalieres.findUnique({
         where: { id_stat: BigInt(id_stat) },
@@ -81,8 +73,6 @@ const resolvers = {
   },
 
   Mutation: {
-
-    // Mutations pour Pays
     createPays: async (_, { nom_pays }) => {
       return await prisma.pays.create({
         data: { nom_pays },
@@ -106,7 +96,6 @@ const resolvers = {
       }
     },
 
-    // Mutations pour Virus
     createVirus: async (_, { nom_virus }) => {
       return await prisma.virus.create({
         data: { nom_virus },
@@ -130,7 +119,6 @@ const resolvers = {
       }
     },
 
-    // Mutations pour Statistiques
     createStatistique: async (
       _,
       {
@@ -184,7 +172,6 @@ const resolvers = {
     },
   },
 
-  // Résolveurs de types
   Pays: {
     statistiques_journalieres: async (parent) => {
       return await prisma.statistiquesJournalieres.findMany({

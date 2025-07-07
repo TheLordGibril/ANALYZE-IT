@@ -6,6 +6,9 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
         "transmission_rate", "mortality_rate", "geographic_spread"
     ];
 
+    const allVirus = [
+        "Covid", "Monkeypox"]
+
     const allPays = [
         "Afghanistan",
         "Africa Eastern and Southern",
@@ -256,12 +259,18 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
 
             <div>
                 <label className="block text-sm font-medium">Virus</label>
-                <input
+                <select
                     name="virus"
+                    className="w-full p-1 rounded"
                     defaultValue={parameters.virus}
                     onChange={handleParameterChange}
-                    className="w-full border rounded px-2 py-1"
-                />
+                >
+                    {allVirus.map((virus) => (
+                        <option key={virus} value={virus}>
+                            {virus}
+                        </option>
+                    ))}
+                </select>
             </div>
 
             <div className="space-y-1">
