@@ -180,37 +180,46 @@ def get_dates_to_predict(all_dates, country_id, virus_id):
     return dates_to_predict
 
 
-def predict_single_day(country_id, virus_id, date_str):
-    d = datetime.strptime(date_str, "%Y-%m-%d")
-    year = d.year
-    day_of_year = d.timetuple().tm_yday
-
-    # Features pour les prédictions
-    X = np.array([[country_id, virus_id, year, day_of_year]])
-    X_geo = np.array([[virus_id, year]])
-
-    return {
-        "nouveaux_cas": max(0, int(new_cases_model.predict(X)[0])),
-        "nouveaux_deces": max(0, int(new_deaths_model.predict(X)[0])),
-        "total_cas": max(0, int(total_cases_model.predict(X)[0])),
-        "total_deces": max(0, int(total_deaths_model.predict(X)[0])),
-        "taux_infection": max(0.0, float(infection_rate_model.predict(X)[0])),
-        "taux_mortalite": max(0.0, float(mortality_rate_model.predict(X)[0])),
-        "geographic_spread": max(0, int(geographic_spread_model.predict(X_geo)[0]))
-    }
-
-
 def generate_predictions(country_id, virus_id, dates_to_predict):
     if not dates_to_predict:
         return {}
 
     logger.info(
         f"Génération des prédictions pour {len(dates_to_predict)} dates")
-    prediction_data = {}
 
+    # Prépare les features pour toutes les dates d'un coup
+    X = []
+    X_geo = []
     for date_str in dates_to_predict:
-        prediction_data[date_str] = predict_single_day(
-            country_id, virus_id, date_str)
+        d = datetime.strptime(date_str, "%Y-%m-%d")
+        year = d.year
+        day_of_year = d.timetuple().tm_yday
+        X.append([country_id, virus_id, year, day_of_year])
+        X_geo.append([virus_id, year])
+
+    X = np.array(X)
+    X_geo = np.array(X_geo)
+
+    # Prédictions batch
+    pred_new_cases = new_cases_model.predict(X)
+    pred_new_deaths = new_deaths_model.predict(X)
+    pred_total_cases = total_cases_model.predict(X)
+    pred_total_deaths = total_deaths_model.predict(X)
+    pred_infection_rate = infection_rate_model.predict(X)
+    pred_mortality_rate = mortality_rate_model.predict(X)
+    pred_geo_spread = geographic_spread_model.predict(X_geo)
+
+    prediction_data = {}
+    for i, date_str in enumerate(dates_to_predict):
+        prediction_data[date_str] = {
+            "nouveaux_cas": max(0, int(pred_new_cases[i])),
+            "nouveaux_deces": max(0, int(pred_new_deaths[i])),
+            "total_cas": max(0, int(pred_total_cases[i])),
+            "total_deces": max(0, int(pred_total_deaths[i])),
+            "taux_infection": max(0.0, float(pred_infection_rate[i])),
+            "taux_mortalite": max(0.0, float(pred_mortality_rate[i])),
+            "geographic_spread": max(0, int(pred_geo_spread[i]))
+        }
 
     return prediction_data
 
@@ -258,49 +267,6 @@ def lissage_officiel_prediction(official_dict, pred_dict, window_size=7):
 
 
 def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
-    """
-    Calcule des prédictions pour un pays et un virus donnés sur une période.
-    """
-    cache = load_prediction_cache(country, virus)
-    d_start = datetime.strptime(date_start, "%Y-%m-%d")
-    d_end = datetime.strptime(date_end, "%Y-%m-%d")
-    if cache:
-        # Filtre la période demandée dans le cache
-        all_dates = [(d_start + timedelta(days=i)).strftime("%Y-%m-%d")
-                     for i in range((d_end - d_start).days + 1)]
-        # Filtrage des données officielles et prédictions
-        official = cache["official"]
-        predictions = cache["predictions"]
-
-        def filter_dict(d):
-            return {k: v for k, v in d.items() if k in all_dates}
-        official_filtered = official.copy()
-        predictions_filtered = predictions.copy()
-        for key in ["new_cases", "new_deaths", "transmission_rate", "mortality_rate"]:
-            if key in official:
-                official_filtered[key] = filter_dict(official[key])
-            if key in predictions:
-                predictions_filtered[key] = filter_dict(predictions[key])
-        result = {
-            "country": country,
-            "virus": virus,
-            "date_start": date_start,
-            "date_end": date_end,
-            "official": official_filtered,
-            "predictions": predictions_filtered
-        }
-        return result
-    # Si cache absent, on calcule sur 10 ans et on stocke
-    d_start_10y = d_start
-    d_end_10y = d_start + timedelta(days=365*10)
-    result_10y = _predict_pandemic_full(country, virus, d_start_10y.strftime(
-        "%Y-%m-%d"), d_end_10y.strftime("%Y-%m-%d"))
-    save_prediction_cache(country, virus, result_10y)
-    # Puis relance la fonction pour servir la période demandée
-    return predict_pandemic(country, virus, date_start, date_end)
-
-
-def _predict_pandemic_full(country: str, virus: str, date_start: str, date_end: str):
     """
     Calcule des prédictions pour un pays et un virus donnés sur une période.
     """
@@ -459,7 +425,21 @@ def _predict_pandemic_full(country: str, virus: str, date_start: str, date_end: 
             "date_start": date_start,
             "date_end": date_end,
             "official": official_data,
-            "predictions": predictions_data
+            "predictions": predictions_data,
+            "field_titles": {
+                "total_cases": "Total des cas",
+                "total_deaths": "Total des décès",
+                "new_cases": "Nouveaux cas",
+                "new_deaths": "Nouveaux décès",
+                "transmission_rate": "Taux d'infection",
+                "mortality_rate": "Taux de mortalité",
+                "peak_date": "Date du pic",
+                "estimated_duration_days": "Durée estimée (jours)",
+                "cases_in_30d": "Cas dans 30 jours",
+                "deaths_in_30d": "Décès dans 30 jours",
+                "new_countries_next_week": "Nouveaux pays la semaine prochaine",
+                "geographic_spread": "Propagation géographique"
+            }
         }
 
         return result

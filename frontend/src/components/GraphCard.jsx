@@ -12,7 +12,41 @@ import {
 
 ChartJS.register(LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, Filler)
 
-export default function GraphCard({ labels, datasets }) {
+const verticalLineWithPointPlugin = {
+    id: 'verticalLineWithPointOnHover',
+    afterDraw: (chart) => {
+        if (chart.tooltip?._active && chart.tooltip._active.length) {
+            const ctx = chart.ctx;
+            const activePoint = chart.tooltip._active[0].element;
+            const x = activePoint.x;
+            const y = activePoint.y;
+
+            // Barre verticale pointillée
+            ctx.save();
+            ctx.beginPath();
+            ctx.setLineDash([8, 4]);
+            ctx.moveTo(x, chart.chartArea.top);
+            ctx.lineTo(x, chart.chartArea.bottom);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#888';
+            ctx.stroke();
+            ctx.restore();
+
+            // Point sur la courbe
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, 2 * Math.PI);
+            ctx.fillStyle = '#4285F4';
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+        }
+    }
+}
+
+export default function GraphCard({ labels, datasets, title }) {
     const data = {
         labels,
         datasets: datasets.map(set => ({
@@ -46,7 +80,8 @@ export default function GraphCard({ labels, datasets }) {
 
     return (
         <div className="w-full">
-            <Line data={data} options={options} />
+            <div className="text-lg font-semibold text-gray-700 mb-2">{title}</div>
+            <Line data={data} options={options} plugins={[verticalLineWithPointPlugin]} />
         </div>
     )
 }

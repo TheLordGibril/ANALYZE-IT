@@ -27,6 +27,7 @@ const AnalyzeIt = () => {
 
     const officialData = prediction?.official ?? {};
     const predictionData = prediction?.predictions ?? {};
+    const fieldTitles = prediction?.field_titles ?? {};
 
     const renderModelComponent = (model) => {
         if (numbers.includes(model)) {
@@ -45,6 +46,7 @@ const AnalyzeIt = () => {
                 <GraphCard
                     key={model}
                     labels={allDates}
+                    title={fieldTitles[model] || model}
                     datasets={[{ label: "Données officielles", data: officialPoints, color: "#3b82f6", dashed: false },
                     { label: "Prédictions", data: predictionPoints, color: "#f59e0b", dashed: true }]} />
             );
