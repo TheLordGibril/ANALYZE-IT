@@ -5,11 +5,9 @@ from sqlalchemy import create_engine, select, Table, MetaData, and_
 from config import config
 import logging
 
-# Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Chargement des modèles une seule fois au démarrage
 logger.info("Chargement des modèles...")
 try:
     new_cases_model = joblib.load("models/new_cases_model.joblib")
@@ -19,11 +17,14 @@ try:
     total_cases_model = joblib.load("models/total_cases_model.joblib")
     total_deaths_model = joblib.load("models/total_deaths_model.joblib")
     peak_date_model = joblib.load("models/peak_date_model.joblib")
-    estimated_duration_model = joblib.load("models/estimated_duration_model.joblib")
+    estimated_duration_model = joblib.load(
+        "models/estimated_duration_model.joblib")
     cases_in_30d_model = joblib.load("models/cases_in_30d_model.joblib")
     deaths_in_30d_model = joblib.load("models/deaths_in_30d_model.joblib")
-    geographic_spread_model = joblib.load("models/geographic_spread_model.joblib")
-    new_countries_next_week_model = joblib.load("models/new_countries_next_week_model.joblib")
+    geographic_spread_model = joblib.load(
+        "models/geographic_spread_model.joblib")
+    new_countries_next_week_model = joblib.load(
+        "models/new_countries_next_week_model.joblib")
     logger.info("Modèles chargés avec succès")
 except Exception as e:
     logger.error(f"Erreur lors du chargement des modèles: {e}")
@@ -53,6 +54,7 @@ def get_virus_id(virus_name):
             return result[0]
         raise ValueError(f"Virus inconnu: {virus_name}")
 
+
 def get_latest_data_date(country_id, virus_id):
     try:
         engine = create_engine(config.get_database_url())
@@ -73,8 +75,10 @@ def get_latest_data_date(country_id, virus_id):
             else:
                 return None
     except Exception as e:
-        logger.error(f"Erreur lors de la récupération de la dernière date: {e}")
+        logger.error(
+            f"Erreur lors de la récupération de la dernière date: {e}")
         return None
+
 
 def get_official_data(country_id, virus_id, date_start, date_end):
     try:
@@ -105,7 +109,8 @@ def get_official_data(country_id, virus_id, date_start, date_end):
             ).order_by(stats.c.date)
 
             results = conn.execute(query).fetchall()
-            logger.info(f"Données officielles récupérées: {len(results)} enregistrements")
+            logger.info(
+                f"Données officielles récupérées: {len(results)} enregistrements")
 
             # Construire le dictionnaire des données officielles
             official_data = {}
@@ -129,7 +134,8 @@ def get_official_data(country_id, virus_id, date_start, date_end):
 
             return official_data
     except Exception as e:
-        logger.error(f"Erreur lors de la récupération des données officielles: {e}")
+        logger.error(
+            f"Erreur lors de la récupération des données officielles: {e}")
         raise
 
 
@@ -138,7 +144,8 @@ def get_dates_to_predict(all_dates, country_id, virus_id):
 
     if latest_data_date is None:
         # Si aucune donnée n'existe, prédire toutes les dates
-        logger.info("Aucune donnée historique trouvée, prédiction de toutes les dates")
+        logger.info(
+            "Aucune donnée historique trouvée, prédiction de toutes les dates")
         return all_dates
 
     logger.info(f"Dernière date avec données officielles: {latest_data_date}")
@@ -174,18 +181,32 @@ def predict_single_day(country_id, virus_id, date_str):
     }
 
 
-
 def generate_predictions(country_id, virus_id, dates_to_predict):
     if not dates_to_predict:
         return {}
 
-    logger.info(f"Génération des prédictions pour {len(dates_to_predict)} dates")
+    logger.info(
+        f"Génération des prédictions pour {len(dates_to_predict)} dates")
     prediction_data = {}
 
     for date_str in dates_to_predict:
-        prediction_data[date_str] = predict_single_day(country_id, virus_id, date_str)
+        prediction_data[date_str] = predict_single_day(
+            country_id, virus_id, date_str)
 
     return prediction_data
+
+
+def moving_average(data_dict, window_size=7):
+    """Lisse un dict {date: valeur} par moyenne glissante (sur les valeurs, garde les dates)."""
+    if not data_dict:
+        return {}
+    dates = sorted(data_dict.keys())
+    values = [data_dict[date] for date in dates]
+    if len(values) < window_size:
+        return dict(zip(dates, values))
+    smoothed = np.convolve(values, np.ones(
+        window_size)/window_size, mode='same')
+    return dict(zip(dates, smoothed))
 
 
 def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
@@ -198,7 +219,8 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
         d_end = datetime.strptime(date_end, "%Y-%m-%d")
 
         if d_start > d_end:
-            raise ValueError("La date de début doit être antérieure à la date de fin")
+            raise ValueError(
+                "La date de début doit être antérieure à la date de fin")
 
         nb_days = (d_end - d_start).days + 1
 
@@ -207,44 +229,57 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
         virus_id = get_virus_id(virus)
 
         # Génération de toutes les dates de la période
-        all_dates = [(d_start + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(nb_days)]
+        all_dates = [(d_start + timedelta(days=i)).strftime("%Y-%m-%d")
+                     for i in range(nb_days)]
 
         # Récupération des données officielles
-        official_raw_data = get_official_data(country_id, virus_id, date_start, date_end)
+        official_raw_data = get_official_data(
+            country_id, virus_id, date_start, date_end)
 
         # Identification des dates à prédire
-        dates_to_predict = get_dates_to_predict(all_dates, country_id, virus_id)
+        dates_to_predict = get_dates_to_predict(
+            all_dates, country_id, virus_id)
 
         # Génération des prédictions uniquement pour les dates nécessaires
-        prediction_raw_data = generate_predictions(country_id, virus_id, dates_to_predict)
+        prediction_raw_data = generate_predictions(
+            country_id, virus_id, dates_to_predict)
 
-        total_cases = max(0, int(total_cases_model.predict(np.array([[country_id, virus_id, d_end.year, d_end.timetuple().tm_yday]]))[0]))
-        total_deaths = max(0, int(total_deaths_model.predict(np.array([[country_id, virus_id, d_end.year, d_end.timetuple().tm_yday]]))[0]))
+        total_cases = max(0, int(total_cases_model.predict(
+            np.array([[country_id, virus_id, d_end.year, d_end.timetuple().tm_yday]]))[0]))
+        total_deaths = max(0, int(total_deaths_model.predict(
+            np.array([[country_id, virus_id, d_end.year, d_end.timetuple().tm_yday]]))[0]))
 
-        peak_day_of_year = int(peak_date_model.predict(np.array([[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0])
-        peak_date = datetime(d_start.year, 1, 1) + timedelta(days=peak_day_of_year - 1)
+        peak_day_of_year = int(peak_date_model.predict(np.array(
+            [[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0])
+        peak_date = datetime(d_start.year, 1, 1) + \
+            timedelta(days=peak_day_of_year - 1)
         peak_date_str = peak_date.strftime("%Y-%m-%d")
 
-        estimated_duration_days = max(1, int(estimated_duration_model.predict(np.array([[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0]))
-        cases_in_30d = max(0, int(cases_in_30d_model.predict(np.array([[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0]))
-        deaths_in_30d = max(0, int(deaths_in_30d_model.predict(np.array([[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0]))
+        estimated_duration_days = max(1, int(estimated_duration_model.predict(np.array(
+            [[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0]))
+        cases_in_30d = max(0, int(cases_in_30d_model.predict(np.array(
+            [[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0]))
+        deaths_in_30d = max(0, int(deaths_in_30d_model.predict(np.array(
+            [[country_id, virus_id, d_start.year, d_start.timetuple().tm_yday]]))[0]))
 
         week = d_end.isocalendar()[1] + 1
         year = d_end.year
         if week > 52:
             week = 1
             year += 1
-        new_countries_next_week = max(0, int(new_countries_next_week_model.predict(np.array([[virus_id, year, week]]))[0]))
+        new_countries_next_week = max(0, int(
+            new_countries_next_week_model.predict(np.array([[virus_id, year, week]]))[0]))
 
-        official_dates = [date for date in all_dates if date in official_raw_data]
+        official_dates = [
+            date for date in all_dates if date in official_raw_data]
 
         official_data = {
             "total_cases": total_cases,
             "total_deaths": total_deaths,
-            "new_cases": {date: official_raw_data[date]["nouveaux_cas"] for date in official_dates},
-            "new_deaths": {date: official_raw_data[date]["nouveaux_deces"] for date in official_dates},
-            "transmission_rate": {date: official_raw_data[date]["taux_infection"] for date in official_dates},
-            "mortality_rate": {date: official_raw_data[date]["taux_mortalite"] for date in official_dates},
+            "new_cases": moving_average({date: official_raw_data[date]["nouveaux_cas"] for date in official_dates}),
+            "new_deaths": moving_average({date: official_raw_data[date]["nouveaux_deces"] for date in official_dates}),
+            "transmission_rate": moving_average({date: official_raw_data[date]["taux_infection"] for date in official_dates}),
+            "mortality_rate": moving_average({date: official_raw_data[date]["taux_mortalite"] for date in official_dates}),
             "peak_date": peak_date_str,
             "estimated_duration_days": estimated_duration_days,
             "cases_in_30d": cases_in_30d,
@@ -267,7 +302,8 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
                     all_mortality_rate[date] = prediction_raw_data[date]["taux_mortalite"]
                     d = datetime.strptime(date, "%Y-%m-%d")
                     X_geo = np.array([[virus_id, d.year]])
-                    all_geographic_spread[date] = max(0, int(geographic_spread_model.predict(X_geo)[0]))
+                    all_geographic_spread[date] = max(
+                        0, int(geographic_spread_model.predict(X_geo)[0]))
                 elif date in prediction_raw_data:
                     all_new_cases[date] = prediction_raw_data[date]["nouveaux_cas"]
                     all_new_deaths[date] = prediction_raw_data[date]["nouveaux_deces"]
