@@ -4,24 +4,6 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine, select, Table, MetaData, and_
 from config import config
 import logging
-import os
-import pickle
-
-CACHE_PATH = "prediction_cache_{country}_{virus}.pkl"
-
-
-def save_prediction_cache(country, virus, data):
-    path = CACHE_PATH.format(country=country, virus=virus)
-    with open(path, "wb") as f:
-        pickle.dump(data, f)
-
-
-def load_prediction_cache(country, virus):
-    path = CACHE_PATH.format(country=country, virus=virus)
-    if os.path.exists(path):
-        with open(path, "rb") as f:
-            return pickle.load(f)
-    return None
 
 
 logging.basicConfig(level=logging.INFO)
