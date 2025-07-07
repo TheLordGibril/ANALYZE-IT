@@ -5,9 +5,14 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.svm import SVR
+from sklearn.neighbors import KNeighborsRegressor
 import joblib
 import json
 import warnings
+import os
 
 warnings.filterwarnings('ignore')
 
@@ -28,7 +33,26 @@ class ModelComparison:
                 min_samples_split=5,
                 min_samples_leaf=3,
                 random_state=42
-            )
+            ),
+            'Gradient Boosting': GradientBoostingRegressor(
+                n_estimators=50,
+                max_depth=3,
+                learning_rate=0.1,
+                random_state=42),
+            # 'SVR': SVR(
+            #     kernel='linear',
+            #     C=1.0,
+            #     epsilon=0.2,
+            #     tol=1e-2),
+            # 'KNN': KNeighborsRegressor(
+            #     n_neighbors=3,
+            #     weights='distance',
+            #     n_jobs=-1),
+            'MLP': MLPRegressor(
+                hidden_layer_sizes=(16,),
+                max_iter=50,
+                early_stopping=True,
+                random_state=42)
         }
         self.results = {}
         self.best_models = {}
@@ -92,37 +116,47 @@ class ModelComparison:
         print(f"\n🔍 Comparaison des algorithmes pour : {model_type_name}")
         print("=" * 60)
 
-        x_train, x_test, y_train, y_test, scaler = self.prepare_data(x, y)
+        try:
+            x_train, x_test, y_train, y_test, scaler = self.prepare_data(x, y)
 
-        comparison_results = {}
+            need_scaling = ['SVR', 'KNN', 'MLP']
 
-        for name, algorithm in self.algorithms.items():
-            print(f"\n📊 Entraînement de {name}...")
+            comparison_results = {}
 
-            try:
-                metrics, trained_model = self.evaluate_model(
-                    algorithm, x_train, x_test, y_train, y_test, name
-                )
+            for name, algorithm in self.algorithms.items():
+                print(f"\n📊 Entraînement de {name}...")
 
-                comparison_results[name] = {
-                    'metrics': metrics,
-                    'model': trained_model,
-                    'scaler': scaler
-                }
+                scale_features = name in need_scaling
+                x_train, x_test, y_train, y_test, scaler = self.prepare_data(
+                    x, y, scale_features=scale_features)
 
-                # Affichage des résultats
-                print(f"   R² Score: {metrics['test_r2']:.4f}")
-                print(f"   RMSE: {metrics['test_rmse']:.4f}")
-                print(f"   MAE: {metrics['test_mae']:.4f}")
-                print(
-                    f"   CV R² (moyenne): {metrics['cv_mean_r2']:.4f} (±{metrics['cv_std_r2']:.4f})")
+                try:
+                    metrics, trained_model = self.evaluate_model(
+                        algorithm, x_train, x_test, y_train, y_test, name
+                    )
 
-                if metrics['overfitting_indicator'] > 0.1:
-                    print("   ⚠️  Possible overfitting détecté!")
+                    comparison_results[name] = {
+                        'metrics': metrics,
+                        'model': trained_model,
+                        'scaler': scaler
+                    }
 
-            except Exception as e:
-                print(f"   ❌ Erreur lors de l'entraînement: {str(e)}")
-                continue
+                    # Affichage des résultats
+                    print(f"   R² Score: {metrics['test_r2']:.4f}")
+                    print(f"   RMSE: {metrics['test_rmse']:.4f}")
+                    print(f"   MAE: {metrics['test_mae']:.4f}")
+                    print(
+                        f"   CV R² (moyenne): {metrics['cv_mean_r2']:.4f} (±{metrics['cv_std_r2']:.4f})")
+
+                    if metrics['overfitting_indicator'] > 0.1:
+                        print("   ⚠️  Possible overfitting détecté!")
+
+                except Exception as e:
+                    print(f"   ❌ Erreur lors de l'entraînement: {str(e)}")
+                    continue
+        except Exception as e:
+            print(f"❌ Erreur lors de la préparation des données: {str(e)}")
+            return None
 
         # Trouver le meilleur modèle
         if comparison_results:
@@ -140,6 +174,15 @@ class ModelComparison:
                 'metrics': comparison_results[best_model_name]['metrics']
             }
 
+            os.makedirs("benchmark", exist_ok=True)
+            results_path = os.path.join(
+                "benchmark", f"comparison_results_{model_type_name}.json")
+            with open(results_path, "w") as f:
+                json.dump(
+                    {k: v['metrics'] for k, v in comparison_results.items()},
+                    f, indent=2
+                )
+
             return comparison_results
 
         return None
@@ -150,12 +193,6 @@ class ModelComparison:
             best_model = self.best_models[model_type_name]['model']
             joblib.dump(best_model, save_path)
             print(f"💾 Meilleur modèle sauvegardé: {save_path}")
-
-            # Sauvegarde aussi les métriques
-            metrics_path = save_path.replace('.joblib', '_metrics.json')
-            with open(metrics_path, 'w') as f:
-                json.dump(
-                    self.best_models[model_type_name]['metrics'], f, indent=2)
 
             return True
         return False

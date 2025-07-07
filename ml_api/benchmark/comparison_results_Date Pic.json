@@ -1,0 +1,62 @@
+{
+  "Linear Regression": {
+    "model_name": "Linear Regression",
+    "test_mse": 9274.093571329287,
+    "test_rmse": 96.3020953631295,
+    "test_mae": 78.35065049497588,
+    "test_r2": 0.3766472727219988,
+    "mse_train": 9251.745097672958,
+    "train_r2": 0.37796321027165747,
+    "cv_mean_r2": 0.37791465164793914,
+    "cv_std_r2": 0.0064416494110203885,
+    "overfitting_indicator": 0.0013159375496586412
+  },
+  "Random Forest": {
+    "model_name": "Random Forest",
+    "test_mse": 4398.424198708024,
+    "test_rmse": 66.32061669426804,
+    "test_mae": 45.05073474511369,
+    "test_r2": 0.7043625127455754,
+    "mse_train": 4418.665055833196,
+    "train_r2": 0.7029131048036956,
+    "cv_mean_r2": 0.7060757555398031,
+    "cv_std_r2": 0.004277165870636435,
+    "overfitting_indicator": -0.0014494079418797545
+  },
+  "Decision Tree": {
+    "model_name": "Decision Tree",
+    "test_mse": 4513.235134399387,
+    "test_rmse": 67.18061576377063,
+    "test_mae": 45.186476324483834,
+    "test_r2": 0.6966455634465301,
+    "mse_train": 4542.614290677313,
+    "train_r2": 0.6945794354993919,
+    "cv_mean_r2": 0.6824526269081918,
+    "cv_std_r2": 0.006813542170111254,
+    "overfitting_indicator": -0.002066127947138119
+  },
+  "Gradient Boosting": {
+    "model_name": "Gradient Boosting",
+    "test_mse": 6411.975777997209,
+    "test_rmse": 80.07481363073666,
+    "test_mae": 63.40854630297288,
+    "test_r2": 0.569022831426732,
+    "mse_train": 6444.341437768406,
+    "train_r2": 0.5667176929819373,
+    "cv_mean_r2": 0.5673164029723955,
+    "cv_std_r2": 0.0055605880264794575,
+    "overfitting_indicator": -0.002305138444794741
+  },
+  "MLP": {
+    "model_name": "MLP",
+    "test_mse": 7598.111590408384,
+    "test_rmse": 87.1671474261283,
+    "test_mae": 69.30161491452114,
+    "test_r2": 0.4892974126672752,
+    "mse_train": 7626.251284262881,
+    "train_r2": 0.4872525327445827,
+    "cv_mean_r2": 0.4862807488676026,
+    "cv_std_r2": 0.0054126991051440644,
+    "overfitting_indicator": -0.002044879922692533
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "Linear Regression": {
+    "model_name": "Linear Regression",
+    "test_mse": 4646.11293897363,
+    "test_rmse": 68.16240121191176,
+    "test_mae": 35.09345790882071,
+    "test_r2": -848.0358670205618,
+    "mse_train": 355.6507185148526,
+    "train_r2": 0.7981213227945378,
+    "cv_mean_r2": -185.83342842908883,
+    "cv_std_r2": 168.20389174160238,
+    "overfitting_indicator": 848.8339883433563
+  },
+  "Random Forest": {
+    "model_name": "Random Forest",
+    "test_mse": 3824.3033,
+    "test_rmse": 61.84095164209555,
+    "test_mae": 27.296666666666667,
+    "test_r2": -697.8574558375636,
+    "mse_train": 170.82279047619042,
+    "train_r2": 0.9030355425067447,
+    "cv_mean_r2": -26.54790507263315,
+    "cv_std_r2": 49.20887809458064,
+    "overfitting_indicator": 698.7604913800703
+  },
+  "Decision Tree": {
+    "model_name": "Decision Tree",
+    "test_mse": 807.365185185185,
+    "test_rmse": 28.414172259370588,
+    "test_mae": 13.388888888888888,
+    "test_r2": -146.53881556683586,
+    "mse_train": 1225.8539682539686,
+    "train_r2": 0.30416623761764483,
+    "cv_mean_r2": -40.34285776511733,
+    "cv_std_r2": 33.430496369910834,
+    "overfitting_indicator": 146.8429818044535
+  },
+  "Gradient Boosting": {
+    "model_name": "Gradient Boosting",
+    "test_mse": 6614.037399715767,
+    "test_rmse": 81.3267323806617,
+    "test_mae": 35.4027011287758,
+    "test_r2": -1207.6565806587191,
+    "mse_train": 0.8576436985796011,
+    "train_r2": 0.99951317411615,
+    "cv_mean_r2": -51.92015455001247,
+    "cv_std_r2": 98.73985787929514,
+    "overfitting_indicator": 1208.6560938328353
+  },
+  "MLP": {
+    "model_name": "MLP",
+    "test_mse": 18.248636639288996,
+    "test_rmse": 4.271842300376852,
+    "test_mae": 3.7399113179509627,
+    "test_r2": -2.3347762386517967,
+    "mse_train": 1890.6258961099043,
+    "train_r2": -0.07317948517266815,
+    "cv_mean_r2": -4.040987991947817,
+    "cv_std_r2": 6.6003774192700595,
+    "overfitting_indicator": 2.261596753479129
+  }
+}

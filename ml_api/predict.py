@@ -351,13 +351,13 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
 
             # Lissage fusionné puis séparation
             liss_new_cases_off, liss_new_cases_pred = lissage_officiel_prediction(
-                dict_new_cases_off, all_new_cases, arrondi=True)
+                dict_new_cases_off, all_new_cases, window_size=200, arrondi=True)
             liss_new_deaths_off, liss_new_deaths_pred = lissage_officiel_prediction(
-                dict_new_deaths_off, all_new_deaths, arrondi=True)
+                dict_new_deaths_off, all_new_deaths, window_size=200, arrondi=True)
             liss_transmission_off, liss_transmission_pred = lissage_officiel_prediction(
-                dict_transmission_off, all_transmission_rate)
+                dict_transmission_off, all_transmission_rate, window_size=200)
             liss_mortality_off, liss_mortality_pred = lissage_officiel_prediction(
-                dict_mortality_off, all_mortality_rate)
+                dict_mortality_off, all_mortality_rate, window_size=200)
 
             official_data = {
                 "total_cases": total_cases,

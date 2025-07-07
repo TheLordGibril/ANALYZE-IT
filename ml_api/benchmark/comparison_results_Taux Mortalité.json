@@ -1,0 +1,62 @@
+{
+  "Linear Regression": {
+    "model_name": "Linear Regression",
+    "test_mse": 19.16720623547135,
+    "test_rmse": 4.3780368015209,
+    "test_mae": 1.797412592732337,
+    "test_r2": 0.014571739195880618,
+    "mse_train": 21.332842818075278,
+    "train_r2": 0.011216882112861759,
+    "cv_mean_r2": 0.011300965441957,
+    "cv_std_r2": 0.002534172679271692,
+    "overfitting_indicator": -0.0033548570830188584
+  },
+  "Random Forest": {
+    "model_name": "Random Forest",
+    "test_mse": 3.600034570204051,
+    "test_rmse": 1.897375706127822,
+    "test_mae": 1.0174324524782585,
+    "test_r2": 0.8149142988410255,
+    "mse_train": 3.6536529480850297,
+    "train_r2": 0.8306521833731395,
+    "cv_mean_r2": 0.8084489002153108,
+    "cv_std_r2": 0.02337185448326564,
+    "overfitting_indicator": 0.015737884532114
+  },
+  "Decision Tree": {
+    "model_name": "Decision Tree",
+    "test_mse": 5.416860900220146,
+    "test_rmse": 2.3274150683150925,
+    "test_mae": 1.0624353501266937,
+    "test_r2": 0.7215072582647302,
+    "mse_train": 4.938909671798795,
+    "train_r2": 0.7710801815824393,
+    "cv_mean_r2": 0.7535614275128172,
+    "cv_std_r2": 0.0316005335825708,
+    "overfitting_indicator": 0.04957292331770913
+  },
+  "Gradient Boosting": {
+    "model_name": "Gradient Boosting",
+    "test_mse": 11.755554820715863,
+    "test_rmse": 3.4286374583376213,
+    "test_mae": 1.4908763320479543,
+    "test_r2": 0.3956210519440555,
+    "mse_train": 12.641676805584643,
+    "train_r2": 0.4140548114592407,
+    "cv_mean_r2": 0.3848167545546867,
+    "cv_std_r2": 0.03794678090073174,
+    "overfitting_indicator": 0.018433759515185222
+  },
+  "MLP": {
+    "model_name": "MLP",
+    "test_mse": 18.56517060540889,
+    "test_rmse": 4.308731902243268,
+    "test_mae": 1.818273061243641,
+    "test_r2": 0.045523716056058205,
+    "mse_train": 20.558563506131524,
+    "train_r2": 0.047104940666903405,
+    "cv_mean_r2": 0.04341582209824959,
+    "cv_std_r2": 0.003003475447940275,
+    "overfitting_indicator": 0.0015812246108452
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "Linear Regression": {
+    "model_name": "Linear Regression",
+    "test_mse": 178.71862714221072,
+    "test_rmse": 13.368568627276845,
+    "test_mae": 4.296544703733148,
+    "test_r2": 0.09416426229737662,
+    "mse_train": 193.08880215130077,
+    "train_r2": 0.0887530487786431,
+    "cv_mean_r2": 0.08898424023457355,
+    "cv_std_r2": 0.003725858002488729,
+    "overfitting_indicator": -0.005411213518733526
+  },
+  "Random Forest": {
+    "model_name": "Random Forest",
+    "test_mse": 16.689447971249578,
+    "test_rmse": 4.085272080443306,
+    "test_mae": 2.0002052464513227,
+    "test_r2": 0.9154094978423445,
+    "mse_train": 16.906256035996826,
+    "train_r2": 0.9202140460879855,
+    "cv_mean_r2": 0.917674763775935,
+    "cv_std_r2": 0.006971670205079027,
+    "overfitting_indicator": 0.004804548245641027
+  },
+  "Decision Tree": {
+    "model_name": "Decision Tree",
+    "test_mse": 18.613809303531685,
+    "test_rmse": 4.314372411316817,
+    "test_mae": 2.052636681209575,
+    "test_r2": 0.9056558683807265,
+    "mse_train": 18.760079050856415,
+    "train_r2": 0.9114652706459426,
+    "cv_mean_r2": 0.9089401103000515,
+    "cv_std_r2": 0.00947025259846326,
+    "overfitting_indicator": 0.00580940226521609
+  },
+  "Gradient Boosting": {
+    "model_name": "Gradient Boosting",
+    "test_mse": 64.01079402488388,
+    "test_rmse": 8.000674598112578,
+    "test_mae": 3.258927253845567,
+    "test_r2": 0.6755611558031795,
+    "mse_train": 67.66558636508809,
+    "train_r2": 0.6806647584385745,
+    "cv_mean_r2": 0.6801739595100121,
+    "cv_std_r2": 0.03429269166916518,
+    "overfitting_indicator": 0.005103602635394999
+  },
+  "MLP": {
+    "model_name": "MLP",
+    "test_mse": 172.51971141035224,
+    "test_rmse": 13.134675915695532,
+    "test_mae": 3.9667136205137474,
+    "test_r2": 0.12558347972710926,
+    "mse_train": 186.90465779593416,
+    "train_r2": 0.11793797626773128,
+    "cv_mean_r2": 0.11253720713007184,
+    "cv_std_r2": 0.0030609988554906745,
+    "overfitting_indicator": -0.007645503459377978
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "Linear Regression": {
+    "model_name": "Linear Regression",
+    "test_mse": 1174999.421984541,
+    "test_rmse": 1083.9739028152574,
+    "test_mae": 347.3823090910063,
+    "test_r2": 0.011168466000918253,
+    "mse_train": 1232559.1093526906,
+    "train_r2": 0.01004978295661807,
+    "cv_mean_r2": 0.009906112229133601,
+    "cv_std_r2": 0.0005803391551171687,
+    "overfitting_indicator": -0.0011186830443001838
+  },
+  "Random Forest": {
+    "model_name": "Random Forest",
+    "test_mse": 297675.75391189667,
+    "test_rmse": 545.5966952904835,
+    "test_mae": 136.35953752956618,
+    "test_r2": 0.74948824070238,
+    "mse_train": 317536.0713081751,
+    "train_r2": 0.7449656569608927,
+    "cv_mean_r2": 0.732675757422661,
+    "cv_std_r2": 0.01030427112926928,
+    "overfitting_indicator": -0.004522583741487285
+  },
+  "Decision Tree": {
+    "model_name": "Decision Tree",
+    "test_mse": 316751.5365367167,
+    "test_rmse": 562.80683767765,
+    "test_mae": 140.26623780658198,
+    "test_r2": 0.7334348409796165,
+    "mse_train": 329832.930734066,
+    "train_r2": 0.7350892311041191,
+    "cv_mean_r2": 0.7145002330274765,
+    "cv_std_r2": 0.017140001761164095,
+    "overfitting_indicator": 0.001654390124502525
+  },
+  "Gradient Boosting": {
+    "model_name": "Gradient Boosting",
+    "test_mse": 638939.4890897048,
+    "test_rmse": 799.3369058724268,
+    "test_mae": 252.05145647189127,
+    "test_r2": 0.46229461622877743,
+    "mse_train": 695986.9347415897,
+    "train_r2": 0.4410065919932744,
+    "cv_mean_r2": 0.44096277197514394,
+    "cv_std_r2": 0.015029900252661153,
+    "overfitting_indicator": -0.021288024235503022
+  },
+  "MLP": {
+    "model_name": "MLP",
+    "test_mse": 1169202.2892915222,
+    "test_rmse": 1081.296577859896,
+    "test_mae": 341.12655634447304,
+    "test_r2": 0.016047096157137397,
+    "mse_train": 1226192.5071012133,
+    "train_r2": 0.01516322476468579,
+    "cv_mean_r2": 0.01292456013928811,
+    "cv_std_r2": 0.0014263041758205439,
+    "overfitting_indicator": -0.0008838713924516073
+  }
+}
