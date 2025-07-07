@@ -4,6 +4,25 @@ from datetime import datetime, timedelta
 from sqlalchemy import create_engine, select, Table, MetaData, and_
 from config import config
 import logging
+import os
+import pickle
+
+CACHE_PATH = "prediction_cache_{country}_{virus}.pkl"
+
+
+def save_prediction_cache(country, virus, data):
+    path = CACHE_PATH.format(country=country, virus=virus)
+    with open(path, "wb") as f:
+        pickle.dump(data, f)
+
+
+def load_prediction_cache(country, virus):
+    path = CACHE_PATH.format(country=country, virus=virus)
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    return None
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -209,9 +228,81 @@ def moving_average(data_dict, window_size=7):
     return dict(zip(dates, smoothed))
 
 
+def lissage_officiel_prediction(official_dict, pred_dict, window_size=7):
+    # Fusionne les deux dicts (dates triées)
+    all_dates = sorted(
+        set(list(official_dict.keys()) + list(pred_dict.keys())))
+    all_values = []
+    for date in all_dates:
+        if date in official_dict:
+            all_values.append(official_dict[date])
+        elif date in pred_dict:
+            all_values.append(pred_dict[date])
+        else:
+            all_values.append(0)
+    # Lissage sur toute la série
+    if len(all_values) < window_size:
+        smoothed = all_values
+    else:
+        smoothed = np.convolve(all_values, np.ones(
+            window_size)/window_size, mode='same')
+    # Sépare à nouveau selon les dates d'origine
+    liss_off = {}
+    liss_pred = {}
+    for i, date in enumerate(all_dates):
+        if date in official_dict:
+            liss_off[date] = float(smoothed[i])
+        if date in pred_dict:
+            liss_pred[date] = float(smoothed[i])
+    return liss_off, liss_pred
+
+
 def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
     """
-    Calcule des prédictions pour un pays et un virus donnés sur une période.=
+    Calcule des prédictions pour un pays et un virus donnés sur une période.
+    """
+    cache = load_prediction_cache(country, virus)
+    d_start = datetime.strptime(date_start, "%Y-%m-%d")
+    d_end = datetime.strptime(date_end, "%Y-%m-%d")
+    if cache:
+        # Filtre la période demandée dans le cache
+        all_dates = [(d_start + timedelta(days=i)).strftime("%Y-%m-%d")
+                     for i in range((d_end - d_start).days + 1)]
+        # Filtrage des données officielles et prédictions
+        official = cache["official"]
+        predictions = cache["predictions"]
+
+        def filter_dict(d):
+            return {k: v for k, v in d.items() if k in all_dates}
+        official_filtered = official.copy()
+        predictions_filtered = predictions.copy()
+        for key in ["new_cases", "new_deaths", "transmission_rate", "mortality_rate"]:
+            if key in official:
+                official_filtered[key] = filter_dict(official[key])
+            if key in predictions:
+                predictions_filtered[key] = filter_dict(predictions[key])
+        result = {
+            "country": country,
+            "virus": virus,
+            "date_start": date_start,
+            "date_end": date_end,
+            "official": official_filtered,
+            "predictions": predictions_filtered
+        }
+        return result
+    # Si cache absent, on calcule sur 10 ans et on stocke
+    d_start_10y = d_start
+    d_end_10y = d_start + timedelta(days=365*10)
+    result_10y = _predict_pandemic_full(country, virus, d_start_10y.strftime(
+        "%Y-%m-%d"), d_end_10y.strftime("%Y-%m-%d"))
+    save_prediction_cache(country, virus, result_10y)
+    # Puis relance la fonction pour servir la période demandée
+    return predict_pandemic(country, virus, date_start, date_end)
+
+
+def _predict_pandemic_full(country: str, virus: str, date_start: str, date_end: str):
+    """
+    Calcule des prédictions pour un pays et un virus donnés sur une période.
     """
     try:
         # Validation des dates
@@ -273,19 +364,15 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
         official_dates = [
             date for date in all_dates if date in official_raw_data]
 
-        official_data = {
-            "total_cases": total_cases,
-            "total_deaths": total_deaths,
-            "new_cases": moving_average({date: official_raw_data[date]["nouveaux_cas"] for date in official_dates}),
-            "new_deaths": moving_average({date: official_raw_data[date]["nouveaux_deces"] for date in official_dates}),
-            "transmission_rate": moving_average({date: official_raw_data[date]["taux_infection"] for date in official_dates}),
-            "mortality_rate": moving_average({date: official_raw_data[date]["taux_mortalite"] for date in official_dates}),
-            "peak_date": peak_date_str,
-            "estimated_duration_days": estimated_duration_days,
-            "cases_in_30d": cases_in_30d,
-            "deaths_in_30d": deaths_in_30d,
-            "new_countries_next_week": new_countries_next_week
-        }
+        # Construction des dicts pour lissage fusionné
+        dict_new_cases_off = {
+            date: official_raw_data[date]["nouveaux_cas"] for date in official_dates}
+        dict_new_deaths_off = {
+            date: official_raw_data[date]["nouveaux_deces"] for date in official_dates}
+        dict_transmission_off = {
+            date: official_raw_data[date]["taux_infection"] for date in official_dates}
+        dict_mortality_off = {
+            date: official_raw_data[date]["taux_mortalite"] for date in official_dates}
 
         if dates_to_predict:
             all_new_cases = {}
@@ -311,13 +398,37 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
                     all_mortality_rate[date] = prediction_raw_data[date]["taux_mortalite"]
                     all_geographic_spread[date] = prediction_raw_data[date]["geographic_spread"]
 
+            # Lissage fusionné puis séparation
+            liss_new_cases_off, liss_new_cases_pred = lissage_officiel_prediction(
+                dict_new_cases_off, all_new_cases)
+            liss_new_deaths_off, liss_new_deaths_pred = lissage_officiel_prediction(
+                dict_new_deaths_off, all_new_deaths)
+            liss_transmission_off, liss_transmission_pred = lissage_officiel_prediction(
+                dict_transmission_off, all_transmission_rate)
+            liss_mortality_off, liss_mortality_pred = lissage_officiel_prediction(
+                dict_mortality_off, all_mortality_rate)
+
+            official_data = {
+                "total_cases": total_cases,
+                "total_deaths": total_deaths,
+                "new_cases": liss_new_cases_off,
+                "new_deaths": liss_new_deaths_off,
+                "transmission_rate": liss_transmission_off,
+                "mortality_rate": liss_mortality_off,
+                "peak_date": peak_date_str,
+                "estimated_duration_days": estimated_duration_days,
+                "cases_in_30d": cases_in_30d,
+                "deaths_in_30d": deaths_in_30d,
+                "new_countries_next_week": new_countries_next_week
+            }
+
             predictions_data = {
                 "total_cases": total_cases,
                 "total_deaths": total_deaths,
-                "new_cases": all_new_cases,
-                "new_deaths": all_new_deaths,
-                "transmission_rate": all_transmission_rate,
-                "mortality_rate": all_mortality_rate,
+                "new_cases": liss_new_cases_pred,
+                "new_deaths": liss_new_deaths_pred,
+                "transmission_rate": liss_transmission_pred,
+                "mortality_rate": liss_mortality_pred,
                 "geographic_spread": all_geographic_spread,
                 "peak_date": peak_date_str,
                 "estimated_duration_days": estimated_duration_days,
@@ -326,6 +437,20 @@ def predict_pandemic(country: str, virus: str, date_start: str, date_end: str):
                 "new_countries_next_week": new_countries_next_week
             }
         else:
+            # Pas de prédiction, lissage classique sur officiel
+            official_data = {
+                "total_cases": total_cases,
+                "total_deaths": total_deaths,
+                "new_cases": moving_average(dict_new_cases_off),
+                "new_deaths": moving_average(dict_new_deaths_off),
+                "transmission_rate": moving_average(dict_transmission_off),
+                "mortality_rate": moving_average(dict_mortality_off),
+                "peak_date": peak_date_str,
+                "estimated_duration_days": estimated_duration_days,
+                "cases_in_30d": cases_in_30d,
+                "deaths_in_30d": deaths_in_30d,
+                "new_countries_next_week": new_countries_next_week
+            }
             predictions_data = {}
 
         result = {
