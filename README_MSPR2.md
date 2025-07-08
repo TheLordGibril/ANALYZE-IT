@@ -45,6 +45,6 @@ npm run dev
 
 - Une documentation d’API mise à jour de type OPEN API. `/backend/openapi_MSPR502.yaml`
 
-- Des tests automatisés et rapport de couverture des tests pour l’interface utilisateur.
+- Des tests automatisés et rapport de couverture des tests pour l’interface utilisateur. La couverture des tests effectués avec Cypress est de 77,87% et est  accessible ici :`documentation_conduite_au_changement.pdf`
 
 - Une documentation en lien avec la conduite au changement dans le contexte de l’accessibilité. `documentation_conduite_au_changement.pdf`
