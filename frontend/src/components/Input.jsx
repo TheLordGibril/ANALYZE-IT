@@ -1,4 +1,4 @@
-export default function Input({ selectedModels, setSelectedModels, parameters, setParameters }) {
+export default function Input({ selectedModels, setSelectedModels, parameters, setParameters, isMenuOpen, setIsMenuOpen }) {
     const allModels = [
         "total_cases", "total_deaths",
         "peak_date", "estimated_duration_days", "cases_in_30d",
@@ -239,92 +239,114 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
     };
 
     return (
-        <div className="w-64 bg-gray-100 text-black p-4 space-y-4">
+        <>
 
-            <div>
-                <label className="block text-sm font-medium">Pays</label>
-                <select
-                    name="country"
-                    className="w-full p-1 rounded"
-                    defaultValue={parameters.country}
-                    onChange={handleParameterChange}
-                >
-                    {allPays.map((pays) => (
-                        <option key={pays} value={pays}>
-                            {pays}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium">Virus</label>
-                <select
-                    name="virus"
-                    className="w-full p-1 rounded"
-                    defaultValue={parameters.virus}
-                    onChange={handleParameterChange}
-                >
-                    {allVirus.map((virus) => (
-                        <option key={virus} value={virus}>
-                            {virus}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div className="space-y-1">
-                <label className="block text-sm font-medium">Début</label>
-                <input
-                    type="date"
-                    name="date_start"
-                    defaultValue={parameters.date_start}
-                    onChange={handleParameterChange}
-                    className="w-full border rounded px-2 py-1"
+            {isMenuOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={() => setIsMenuOpen(false)}
                 />
-                <label className="block text-sm font-medium">Fin</label>
-                <input
-                    type="date"
-                    name="date_end"
-                    defaultValue={parameters.date_end}
-                    onChange={handleParameterChange}
-                    className="w-full border rounded px-2 py-1"
-                />
-            </div>
-
-            <div>
-                <h4 className="text-sm font-semibold mt-4 mb-2">Models</h4>
+            )}
 
 
-                <div className="flex items-center space-x-2 mb-2">
+            <div className={`
+                fixed lg:relative top-0 left-0 h-full w-64 bg-gray-100 text-black p-4 space-y-4 z-50
+                transform transition-transform duration-300 ease-in-out
+                ${isMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}>
+
+                <div className="flex justify-end lg:hidden mb-4">
+                    <button
+                        onClick={() => setIsMenuOpen(false)}
+                        className="text-gray-600 hover:text-gray-800 text-xl font-bold"
+                    >
+                        ×
+                    </button>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium">Pays</label>
+                    <select
+                        name="country"
+                        className="w-full p-1 rounded"
+                        defaultValue={parameters.country}
+                        onChange={handleParameterChange}
+                    >
+                        {allPays.map((pays) => (
+                            <option key={pays} value={pays}>
+                                {pays}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium">Virus</label>
+                    <select
+                        name="virus"
+                        className="w-full p-1 rounded"
+                        defaultValue={parameters.virus}
+                        onChange={handleParameterChange}
+                    >
+                        {allVirus.map((virus) => (
+                            <option key={virus} value={virus}>
+                                {virus}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="space-y-1">
+                    <label className="block text-sm font-medium">Début</label>
                     <input
-                        type="checkbox"
-                        checked={selectedModels.length === allModels.length}
-                        onChange={(e) => {
-                            if (e.target.checked) {
-                                setSelectedModels(allModels);
-                            } else {
-                                setSelectedModels([]);
-                            }
-                        }}
+                        type="date"
+                        name="date_start"
+                        defaultValue={parameters.date_start}
+                        onChange={handleParameterChange}
+                        className="w-full border rounded px-2 py-1"
                     />
-                    <span className="text-sm font-medium">Tout sélectionner</span>
+                    <label className="block text-sm font-medium">Fin</label>
+                    <input
+                        type="date"
+                        name="date_end"
+                        defaultValue={parameters.date_end}
+                        onChange={handleParameterChange}
+                        className="w-full border rounded px-2 py-1"
+                    />
                 </div>
 
+                <div>
+                    <h4 className="text-sm font-semibold mt-4 mb-2">Models</h4>
 
-                <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
-                    {allModels.map((model) => (
-                        <div key={model} className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                checked={selectedModels.includes(model)}
-                                onChange={() => handleSetSelectedModels(model)}
-                            />
-                            <span className="text-sm">{model}</span>
-                        </div>
-                    ))}
+                    <div className="flex items-center space-x-2 mb-2">
+                        <input
+                            type="checkbox"
+                            checked={selectedModels.length === allModels.length}
+                            onChange={(e) => {
+                                if (e.target.checked) {
+                                    setSelectedModels(allModels);
+                                } else {
+                                    setSelectedModels([]);
+                                }
+                            }}
+                        />
+                        <span className="text-sm font-medium">Tout sélectionner</span>
+                    </div>
+
+                    <div className="space-y-1 max-h-72 overflow-y-auto pr-1">
+                        {allModels.map((model) => (
+                            <div key={model} className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedModels.includes(model)}
+                                    onChange={() => handleSetSelectedModels(model)}
+                                />
+                                <span className="text-sm">{model}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
