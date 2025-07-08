@@ -7,3 +7,4 @@ sqlalchemy
 scikit-learn
 dotenv
 psycopg2-binary
+fpdf2
