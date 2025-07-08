@@ -33,7 +33,7 @@ const AnalyzeIt = () => {
     const renderModelComponent = (model) => {
         if (numbers.includes(model) || text.includes(model)) {
             const value = officialData[model];
-            return <NumberCard key={model} name={model} value={value} parameters={parameters} />;
+            return <NumberCard key={model} name={fieldTitles[model] || model} value={value} parameters={parameters} />;
         } else if (graphs.includes(model)) {
             const officialObj = officialData[model] ?? {};
             const predictionObj = predictionData[model] ?? {};

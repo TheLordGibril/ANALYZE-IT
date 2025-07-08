@@ -104,7 +104,7 @@ export default function GraphCard({ labels, datasets, title }) {
                     autoSkip: false,
                     maxRotation: 0,
                     callback: function (value, index, ticks) {
-                        const label = this.getLabelForValue(value);
+                        const label = this.getLabelForValue("value");
 
                         if (!label || label.length !== 10) return '';
 
