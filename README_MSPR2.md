@@ -36,8 +36,8 @@ npm run dev
 ## ***Livrables***
 
 - Une documentation détaillée comprenant le choix de l’algorithme utilisé pour créer l’IA ainsi que les principes d’ergonomie et d’accessibilité mis en place de l’interface utilisateur. Les métriques de performance de votre IA devront être apportée (Précision, score, etc.).
-La documentation sur l'ergonomie et l'accessibilité se trouve ici : `documentation_conduite_au_changement.pdf.
-Le benchmark des modèles IA se trouve ici : `rapport_benchmark.pdf
+La documentation sur l'ergonomie et l'accessibilité se trouve ici : `documentation_ergonomie_accessibilité_et_tests.pdf`.
+Le benchmark des modèles IA se trouve ici : `rapport_benchmark.pdf`
 
 
 - Benchmark des solutions Front-end : `frontend_benchmark.pdf`
@@ -48,6 +48,6 @@ Le benchmark des modèles IA se trouve ici : `rapport_benchmark.pdf
 
 - Une documentation d’API mise à jour de type OPEN API. `/backend/openapi_MSPR502.yaml`
 
-- Des tests automatisés et rapport de couverture des tests pour l’interface utilisateur. La couverture des tests effectués avec Cypress est de 77,87% et une capture d'écran des résultats est accessible ici : `documentation_conduite_au_changement.pdf`. Les résultats sont également disponibles ici : `/cypress/coverage/lcov-report/index.html`
+- Des tests automatisés et rapport de couverture des tests pour l’interface utilisateur. La couverture des tests effectués avec Cypress est de 77,87% et une capture d'écran des résultats est accessible ici : `documentation_ergonomie_accessibilité_et_tests.pdf`. Les résultats sont également disponibles directement en HTML ici : `/cypress/coverage/lcov-report/index.html`
 
-- Une documentation en lien avec la conduite au changement dans le contexte de l’accessibilité. `documentation_conduite_au_changement.pdf`
+- Documentation en lien avec la conduite au changement dans le contexte de l’accessibilité. `documentation_conduite_au_changement.pdf`
