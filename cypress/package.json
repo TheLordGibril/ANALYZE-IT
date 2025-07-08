@@ -3,13 +3,50 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "cy:open": "cypress open"
+    "cy:open": "cypress open",
+    "cy:coverage": "cypress run && nyc report --reporter=html --reporter=text",
+    "cy:coverage:open": "cypress open --env coverage=true"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "cypress": "^14.5.1"
+    "@babel/core": "^7.28.0",
+    "@babel/preset-env": "^7.28.0",
+    "@babel/preset-react": "^7.27.1",
+    "@cypress/code-coverage": "^3.14.5",
+    "babel-plugin-istanbul": "^7.0.0",
+    "cypress": "^14.5.1",
+    "nyc": "^17.1.0",
+    "vite-plugin-istanbul": "^7.0.0"
+  },
+  "nyc": {
+    "report-dir": "coverage",
+    "reporter": [
+      "text",
+      "json",
+      "html",
+      "lcov"
+    ],
+    "extension": [
+      ".js",
+      ".jsx",
+      ".ts",
+      ".tsx"
+    ],
+    "exclude": [
+      "cypress/**/*.*",
+      "**/*.cy.js",
+      "**/*.test.js",
+      "**/*.spec.js",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/coverage/**",
+      "src/main.jsx"
+    ],
+    "instrument": false,
+    "sourceMap": false,
+    "all": true
   }
 }

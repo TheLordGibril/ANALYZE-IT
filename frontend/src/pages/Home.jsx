@@ -30,9 +30,9 @@ const AnalyzeIt = () => {
     const fieldTitles = prediction?.field_titles ?? {};
 
     const renderModelComponent = (model) => {
-        if (numbers.includes(model)) {
+        if (numbers.includes(model) || text.includes(model)) {
             const value = officialData[model];
-            return <NumberCard key={model} id={model} name={model} value={value} parameters={parameters} />;
+            return <NumberCard key={model} name={model} value={value} parameters={parameters} />;
         } else if (graphs.includes(model)) {
             const officialObj = officialData[model] ?? {};
             const predictionObj = predictionData[model] ?? {};
@@ -51,9 +51,6 @@ const AnalyzeIt = () => {
                     datasets={[{ label: "Données officielles", data: officialPoints, color: "#3b82f6", dashed: false },
                     { label: "Prédictions", data: predictionPoints, color: "#f59e0b", dashed: true }]} />
             );
-        } else if (text.includes(model)) {
-            const value = officialData[model];
-            return <TextCard key={model} id={model} name={model} value={value} parameters={parameters} />;
         } else {
             return null;
         }
