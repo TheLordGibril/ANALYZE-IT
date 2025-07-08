@@ -17,11 +17,11 @@
     "test_rmse": 2229.622670468231,
     "test_mae": 568.4458255833084,
     "test_r2": 0.7683287255694631,
-    "mse_train": 5216450.017021542,
-    "train_r2": 0.761794336015571,
+    "mse_train": 5216450.017021544,
+    "train_r2": 0.7617943360155709,
     "cv_mean_r2": 0.7539902959331175,
-    "cv_std_r2": 0.013621135173545677,
-    "overfitting_indicator": -0.006534389553892073
+    "cv_std_r2": 0.013621135173545686,
+    "overfitting_indicator": -0.006534389553892184
   },
   "Decision Tree": {
     "model_name": "Decision Tree",

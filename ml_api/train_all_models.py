@@ -88,14 +88,16 @@ def prepare_features(df):
         group['growth_rate'] = group['nouveaux_cas'].pct_change().fillna(0)
 
         # Remplacer les valeurs infinies par 0
-        group['growth_rate'] = group['growth_rate'].replace([np.inf, -np.inf], 0)
+        group['growth_rate'] = group['growth_rate'].replace(
+            [np.inf, -np.inf], 0)
 
         return group
 
     # Appliquer les calculs par groupe avec gestion d'erreur
     try:
         tqdm_disabled = True  # Désactiver la barre de progression pour éviter les conflits
-        df = df.groupby(['id_pays', 'id_virus'], group_keys=False).apply(calculate_rolling_features)
+        df = df.groupby(['id_pays', 'id_virus'], group_keys=False).apply(
+            calculate_rolling_features)
         df = df.reset_index(drop=True)
 
         print(f"   ✅ Features de tendance ajoutées avec succès")
@@ -127,17 +129,20 @@ def safe_train_model(comparator, X, y, model_name, save_path, min_samples=100):
     try:
         # Vérifier qu'il y a assez de données
         if len(X) < min_samples:
-            print(f"   ⚠️ Pas assez de données ({len(X)} < {min_samples}). Modèle {model_name} ignoré.")
+            print(
+                f"   ⚠️ Pas assez de données ({len(X)} < {min_samples}). Modèle {model_name} ignoré.")
             return False
 
         # Vérifier qu'il n'y a pas que des zéros
         if np.all(y == 0):
-            print(f"   ⚠️ Toutes les valeurs cibles sont nulles. Modèle {model_name} ignoré.")
+            print(
+                f"   ⚠️ Toutes les valeurs cibles sont nulles. Modèle {model_name} ignoré.")
             return False
 
         # Vérifier qu'il y a de la variance dans les données
         if np.var(y) == 0:
-            print(f"   ⚠️ Aucune variance dans les données cibles. Modèle {model_name} ignoré.")
+            print(
+                f"   ⚠️ Aucune variance dans les données cibles. Modèle {model_name} ignoré.")
             return False
 
         # Entraîner le modèle
@@ -145,7 +150,8 @@ def safe_train_model(comparator, X, y, model_name, save_path, min_samples=100):
         success = comparator.save_best_model(model_name, save_path)
 
         if success:
-            print(f"   ✅ Modèle {model_name} entraîné et sauvegardé avec succès")
+            print(
+                f"   ✅ Modèle {model_name} entraîné et sauvegardé avec succès")
             return True
         else:
             print(f"   ❌ Échec de la sauvegarde du modèle {model_name}")
@@ -182,7 +188,6 @@ def main():
     # Préparer les données principales
     X_main = df[features_to_use].fillna(0).values
 
-
     # ENTRAÎNEMENT DES MODÈLES PRINCIPAUX
     models_to_train = [
         ("Nouveaux Cas", "nouveaux_cas", "models/new_cases_model.joblib"),
@@ -199,7 +204,8 @@ def main():
 
         if column_name in df.columns:
             y = df[column_name].fillna(0).values
-            success = safe_train_model(comparator, X_main, y, model_name, save_path)
+            success = safe_train_model(
+                comparator, X_main, y, model_name, save_path)
             if success:
                 trained_models += 1
 
@@ -223,16 +229,19 @@ def main():
 
         if len(peak_data) >= 50:
             peak_df = pd.DataFrame(peak_data)
-            df_peak = pd.merge(df, peak_df, on=['id_pays', 'id_virus', 'year'], how='inner')
+            df_peak = pd.merge(
+                df, peak_df, on=['id_pays', 'id_virus', 'year'], how='inner')
 
             if len(df_peak) > 0:
                 X_peak = df_peak[basic_features].values
                 y_peak = df_peak["peak_day_of_year"].values
-                safe_train_model(comparator, X_peak, y_peak, "Date Pic", "models/peak_date_model.joblib", 50)
+                safe_train_model(comparator, X_peak, y_peak,
+                                 "Date Pic", "models/peak_date_model.joblib", 50)
             else:
                 print("Aucune donnée après merge pour les dates de pic.")
         else:
-            print(f"Pas assez de données pour les dates de pic ({len(peak_data)} < 50).")
+            print(
+                f"Pas assez de données pour les dates de pic ({len(peak_data)} < 50).")
 
     except Exception as e:
         print(f"Erreur calcul date de pic: {e}")
@@ -257,7 +266,8 @@ def main():
 
         if len(duration_data) >= 50:
             duration_df = pd.DataFrame(duration_data)
-            df_duration = pd.merge(df, duration_df, on=['id_pays', 'id_virus', 'year'], how='inner')
+            df_duration = pd.merge(df, duration_df, on=[
+                                   'id_pays', 'id_virus', 'year'], how='inner')
 
             if len(df_duration) > 0:
                 X_duration = df_duration[basic_features].values
@@ -267,17 +277,19 @@ def main():
             else:
                 print("Aucune donnée après merge pour les durées.")
         else:
-            print(f"Pas assez de données pour les durées ({len(duration_data)} < 50).")
+            print(
+                f"Pas assez de données pour les durées ({len(duration_data)} < 50).")
 
     except Exception as e:
         print(f"Erreur calcul durée: {e}")
 
-    # 3. MODÈLES PRÉDICTIONS 30 JOURS ET 7 JOURS
-    print(f"\nCalcul des prédictions 30 jours et 7 jours...")
+    # 3. MODÈLES PRÉDICTIONS 30 JOURS
+    print(f"\nCalcul des prédictions 30 jours...")
     try:
-        df_sorted = df.sort_values(['id_pays', 'id_virus', 'date']).reset_index(drop=True)
+        df_sorted = df.sort_values(
+            ['id_pays', 'id_virus', 'date']).reset_index(drop=True)
 
-        # Calcul simplifié et robuste des sommes sur 30 et 7 jours
+        # Calcul simplifié et robuste des sommes sur 30 jours
         def calculate_rolling_predictions(group):
             group = group.sort_values('date').reset_index(drop=True)
 
@@ -290,18 +302,10 @@ def main():
                 window=window_30, min_periods=1
             ).sum()
 
-            # Fenêtres de 7 jours
-            window_7 = min(7, len(group))
-            group['cases_in_7d'] = group['nouveaux_cas'].rolling(
-                window=window_7, min_periods=1
-            ).sum()
-            group['deaths_in_7d'] = group['nouveaux_deces'].rolling(
-                window=window_7, min_periods=1
-            ).sum()
-
             return group
 
-        df_rolling = df_sorted.groupby(['id_pays', 'id_virus'], group_keys=False).apply(calculate_rolling_predictions)
+        df_rolling = df_sorted.groupby(['id_pays', 'id_virus'], group_keys=False).apply(
+            calculate_rolling_predictions)
         df_rolling = df_rolling.reset_index(drop=True)
 
         X_rolling = df_rolling[basic_features].values
@@ -309,14 +313,10 @@ def main():
         # Modèles 30 jours
         y_cases_30d = df_rolling["cases_in_30d"].values
         y_deaths_30d = df_rolling["deaths_in_30d"].values
-        safe_train_model(comparator, X_rolling, y_cases_30d, "Cas 30 Jours", "models/cases_in_30d_model.joblib")
-        safe_train_model(comparator, X_rolling, y_deaths_30d, "Décès 30 Jours", "models/deaths_in_30d_model.joblib")
-
-        # Modèles 7 jours
-        y_cases_7d = df_rolling["cases_in_7d"].values
-        y_deaths_7d = df_rolling["deaths_in_7d"].values
-        safe_train_model(comparator, X_rolling, y_cases_7d, "Cas 7 Jours", "models/cases_in_7d_model.joblib")
-        safe_train_model(comparator, X_rolling, y_deaths_7d, "Décès 7 Jours", "models/deaths_in_7d_model.joblib")
+        safe_train_model(comparator, X_rolling, y_cases_30d,
+                         "Cas 30 Jours", "models/cases_in_30d_model.joblib")
+        safe_train_model(comparator, X_rolling, y_deaths_30d,
+                         "Décès 30 Jours", "models/deaths_in_30d_model.joblib")
 
     except Exception as e:
         print(f"Erreur calcul prédictions rolling: {e}")
@@ -336,7 +336,8 @@ def main():
             safe_train_model(comparator, X_geo, y_geo, "Propagation Géographique",
                              "models/geographic_spread_model.joblib", 20)
         else:
-            print(f"Pas assez de données pour la propagation géographique ({len(geo_spread)} < 20).")
+            print(
+                f"Pas assez de données pour la propagation géographique ({len(geo_spread)} < 20).")
 
     except Exception as e:
         print(f"Erreur propagation géographique: {e}")
@@ -345,7 +346,8 @@ def main():
     print(f"\nCalcul des nouveaux pays par semaine...")
     try:
         # Calculer la première occurrence de chaque virus par pays
-        first_cases = df.groupby(['id_virus', 'id_pays'])['date'].min().reset_index()
+        first_cases = df.groupby(['id_virus', 'id_pays'])[
+            'date'].min().reset_index()
         first_cases.columns = ['id_virus', 'id_pays', 'first_case_date']
         first_cases['year'] = first_cases['first_case_date'].dt.year
         first_cases['week'] = first_cases['first_case_date'].dt.isocalendar().week
@@ -358,18 +360,20 @@ def main():
         )
 
         if len(new_countries_week) >= 20:
-            X_new_countries = new_countries_week[["id_virus", "year", "week"]].values
+            X_new_countries = new_countries_week[[
+                "id_virus", "year", "week"]].values
             y_new_countries = new_countries_week["new_countries"].values
             safe_train_model(comparator, X_new_countries, y_new_countries, "Nouveaux Pays Semaine",
                              "models/new_countries_next_week_model.joblib", 20)
         else:
-            print(f"Pas assez de données pour les nouveaux pays ({len(new_countries_week)} < 20).")
+            print(
+                f"Pas assez de données pour les nouveaux pays ({len(new_countries_week)} < 20).")
 
     except Exception as e:
         print(f"Erreur nouveaux pays: {e}")
 
-
     comparator.generate_comparison_report()
+
 
 if __name__ == "__main__":
     main()
