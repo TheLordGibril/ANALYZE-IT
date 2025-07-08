@@ -18,8 +18,12 @@ const verticalLineWithPointPlugin = {
         if (chart.tooltip?._active && chart.tooltip._active.length) {
             const ctx = chart.ctx;
             const activePoint = chart.tooltip._active[0].element;
+            const datasetIndex = chart.tooltip._active[0].datasetIndex;
+            const dataset = chart.data.datasets[datasetIndex];
             const x = activePoint.x;
             const y = activePoint.y;
+
+            const pointColor = dataset.borderColor || '#4285F4';
 
             ctx.save();
             ctx.beginPath();
@@ -34,7 +38,7 @@ const verticalLineWithPointPlugin = {
             ctx.save();
             ctx.beginPath();
             ctx.arc(x, y, 6, 0, 2 * Math.PI);
-            ctx.fillStyle = '#4285F4';
+            ctx.fillStyle = pointColor;
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 2;
             ctx.fill();
