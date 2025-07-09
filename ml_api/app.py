@@ -1,4 +1,3 @@
-# app.py
 from fastapi import FastAPI, Query
 from predict import predict_pandemic
 
