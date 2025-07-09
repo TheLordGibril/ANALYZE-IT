@@ -1,4 +1,4 @@
-export default function Input({ selectedModels, setSelectedModels, parameters, setParameters, isMenuOpen, setIsMenuOpen }) {
+export default function Input({ selectedModels, setSelectedModels, parameters, setParameters, isMenuOpen, setIsMenuOpen, fieldTitles }) {
     const allModels = [
         "total_cases", "total_deaths",
         "peak_date", "estimated_duration_days", "cases_in_30d",
@@ -341,7 +341,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
                                     checked={selectedModels.includes(model)}
                                     onChange={() => handleSetSelectedModels(model)}
                                 />
-                                <span className="text-sm">{model}</span>
+                                <span className="text-sm">{fieldTitles?.[model] || model}</span>
                             </div>
                         ))}
                     </div>

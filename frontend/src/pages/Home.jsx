@@ -95,6 +95,7 @@ const AnalyzeIt = () => {
                     setParameters={setParameters}
                     isMenuOpen={isMenuOpen}
                     setIsMenuOpen={setIsMenuOpen}
+                    fieldTitles={fieldTitles}
                 />
 
 
