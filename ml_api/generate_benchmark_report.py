@@ -3,7 +3,7 @@ import json
 from fpdf import FPDF
 
 BENCHMARK_DIR = "benchmark"
-OUTPUT_PDF = "rapport_benchmark.pdf"
+OUTPUT_PDF = "../models_benchmark.pdf"
 
 
 def get_best_model(metrics_dict):
