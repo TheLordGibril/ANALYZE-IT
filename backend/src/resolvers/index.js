@@ -9,7 +9,9 @@ const resolvers = {
   Query: {
     predictPandemic: async (_, { country, virus, date_start, date_end }) => {
       try {
-        const response = await axios.get(`http://127.0.0.1:8000/predict`, {
+        const apiUrl = process.env.API_IA_URL || 'http://127.0.0.1:8000';
+        console.log('🔍 API_IA_URL utilisée:', apiUrl);
+        const response = await axios.get(`${apiUrl}/predict`, {
           params: { country, virus, date_start, date_end },
         });
         return response.data;

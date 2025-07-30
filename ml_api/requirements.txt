@@ -4,7 +4,7 @@ joblib
 numpy
 pandas
 sqlalchemy
-scikit-learn
+scikit-learn==1.7.0
 dotenv
 psycopg2-binary
 fpdf2

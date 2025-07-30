@@ -1,0 +1,280 @@
+networks:
+  usa:
+    driver: bridge
+  france:
+    driver: bridge
+  suisse:
+    driver: bridge
+
+volumes:
+  postgres-usa-data:
+  postgres-france-data:
+  postgres-suisse-data:
+
+services:
+  postgres-usa:
+    image: postgres:15-alpine
+    container_name: postgres-usa
+    environment:
+      POSTGRES_DB: oms_usa
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - postgres-usa-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - usa
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-usa:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-usa
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
+      JWT_SECRET: ${JWT_SECRET}
+      API_IA_URL: http://api-ia-usa:8000
+      PORT: 4000
+      GDPR_MODE: true
+      LOCALE: en-US
+    ports:
+      - "4000:4000"
+    depends_on:
+      postgres-usa:
+        condition: service_healthy
+    networks:
+      - usa
+    restart: unless-stopped
+
+  api-ia-usa:
+    build:
+      context: ./ml_api
+      dockerfile: Dockerfile
+    container_name: api-ia-usa
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres-usa:
+        condition: service_healthy
+    networks:
+      - usa
+    restart: unless-stopped
+
+  frontend-usa:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-usa
+    environment:
+      VITE_API_URL: http://backend-usa:4000
+      VITE_COUNTRY: USA
+      VITE_LOCALE: en-US
+      VITE_GDPR_MODE: true
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-usa
+    networks:
+      - usa
+    restart: unless-stopped
+
+  etl-usa:
+    build:
+      context: .
+      dockerfile: ./csv_to_postgres/Dockerfile
+    container_name: etl-usa
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+    depends_on:
+      postgres-usa:
+        condition: service_healthy
+    networks:
+      - usa
+    restart: unless-stopped
+
+  postgres-france:
+    image: postgres:15-alpine
+    container_name: postgres-france
+    environment:
+      POSTGRES_DB: oms_france
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - postgres-france-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    networks:
+      - france
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-france:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-france
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
+      JWT_SECRET: ${JWT_SECRET}
+      API_IA_URL: http://api-ia-france:8000
+      PORT: 4000
+      GDPR_MODE: true
+      LOCALE: fr-FR
+    ports:
+      - "4001:4000"
+    depends_on:
+      postgres-france:
+        condition: service_healthy
+    networks:
+      - france
+    restart: unless-stopped
+
+  api-ia-france:
+    build:
+      context: ./ml_api
+      dockerfile: Dockerfile
+    container_name: api-ia-france
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres-france:
+        condition: service_healthy
+    networks:
+      - france
+    restart: unless-stopped
+
+  frontend-france:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-france
+    environment:
+      VITE_API_URL: http://backend-france:4000
+      VITE_COUNTRY: FRANCE
+      VITE_LOCALE: fr-FR
+      VITE_GDPR_MODE: true
+    ports:
+      - "3002:80"
+    depends_on:
+      - backend-france
+    networks:
+      - france
+    restart: unless-stopped
+
+  etl-france:
+    build:
+      context: .
+      dockerfile: ./csv_to_postgres/Dockerfile
+    container_name: etl-france
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+    depends_on:
+      postgres-france:
+        condition: service_healthy
+    networks:
+      - france
+    restart: unless-stopped
+
+  postgres-suisse:
+    image: postgres:15-alpine
+    container_name: postgres-suisse
+    environment:
+      POSTGRES_DB: oms_suisse
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - postgres-suisse-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5434:5432"
+    networks:
+      - suisse
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-suisse:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-suisse
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-suisse:5432/oms_suisse
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 4000
+      MULTI_LANG: "fr,de,it"
+    ports:
+      - "4002:4000"
+    depends_on:
+      postgres-suisse:
+        condition: service_healthy
+    networks:
+      - suisse
+    restart: unless-stopped
+
+  frontend-suisse:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend-suisse
+    environment:
+      VITE_API_URL: http://backend-suisse:4000
+      VITE_COUNTRY: suisse
+      VITE_MULTI_LANG: "fr,de,it"
+    ports:
+      - "3004:80"
+    depends_on:
+      - backend-suisse
+    networks:
+      - suisse
+    restart: unless-stopped
+
+  etl-suisse:
+    build:
+      context: .
+      dockerfile: ./csv_to_postgres/Dockerfile
+    container_name: etl-suisse
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-suisse:5432/oms_suisse
+      PYTHONUNBUFFERED: 1
+      MULTI_LANG: "fr,de,it"
+    depends_on:
+      postgres-suisse:
+        condition: service_healthy
+    networks:
+      - suisse
+    restart: unless-stopped

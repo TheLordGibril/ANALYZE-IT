@@ -1,18 +1,24 @@
 import os
 import logging
 from dotenv import load_dotenv
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, urlparse
 
 class Config:
     def __init__(self):
         load_dotenv()
-        
-        # Configuration base de données
-        self.db_host = os.getenv('DB_HOST', 'localhost')
-        self.db_port = os.getenv('DB_PORT', '5432')
-        self.db_name = os.getenv('DB_NAME')
-        self.db_user = os.getenv('DB_USER')
-        self.db_password = os.getenv('DB_PASSWORD')
+
+        database_url = os.getenv('DATABASE_URL')
+
+        if database_url:
+            # Utiliser DATABASE_URL de Docker Compose
+            self._parse_database_url(database_url)
+        else:
+            # Configuration base de données
+            self.db_host = os.getenv('DB_HOST', 'localhost')
+            self.db_port = os.getenv('DB_PORT', '5432')
+            self.db_name = os.getenv('DB_NAME')
+            self.db_user = os.getenv('DB_USER')
+            self.db_password = os.getenv('DB_PASSWORD')
         
         # Configuration des fichiers
         self.csv_file_path = os.getenv('CSV_FILE_PATH')
@@ -22,7 +28,16 @@ class Config:
         
         # Configuration du logging sécurisé
         self._configurer_logging()
-    
+
+    def _parse_database_url(self, database_url):
+        parsed = urlparse(database_url)
+
+        self.db_host = parsed.hostname
+        self.db_port = str(parsed.port) if parsed.port else '5432'
+        self.db_name = parsed.path.lstrip('/')
+        self.db_user = parsed.username
+        self.db_password = parsed.password
+
     def _valider_config(self):
         params_obligatoires = {
             'DB_NAME': self.db_name,
