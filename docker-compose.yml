@@ -42,7 +42,7 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
-      JWT_SECRET: ${JWT_SECRET}
+      KEY: ${JWT_SECRET}
       JWT_EXPIRES: ${JWT_EXPIRES}
       API_IA_URL: http://api-ia-usa:8000
       PORT: 4000
@@ -81,7 +81,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend-usa
     environment:
-      VITE_API_URL: http://backend-usa:4000
+      VITE_API_URL: http://backend-usa:4000/graphql
       VITE_COUNTRY: USA
       VITE_LOCALE: en-US
       VITE_GDPR_MODE: true
@@ -139,7 +139,7 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
-      JWT_SECRET: ${JWT_SECRET}
+      KEY: ${JWT_SECRET}
       JWT_EXPIRES: ${JWT_EXPIRES}
       API_IA_URL: http://api-ia-france:8000
       PORT: 4000
@@ -178,7 +178,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend-france
     environment:
-      VITE_API_URL: http://backend-france:4000
+      VITE_API_URL: http://backend-france:4000/graphql
       VITE_COUNTRY: FRANCE
       VITE_LOCALE: fr-FR
       VITE_GDPR_MODE: true
@@ -236,7 +236,7 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-suisse:5432/oms_suisse
-      JWT_SECRET: ${JWT_SECRET}
+      KEY: ${JWT_SECRET}
       JWT_EXPIRES: ${JWT_EXPIRES}
       PORT: 4000
       MULTI_LANG: "fr,de,it"
@@ -255,7 +255,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend-suisse
     environment:
-      VITE_API_URL: http://backend-suisse:4000
+      VITE_API_URL: http://backend-suisse:4000/graphql
       VITE_COUNTRY: suisse
       VITE_MULTI_LANG: "fr,de,it"
     ports:

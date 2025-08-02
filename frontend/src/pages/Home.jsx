@@ -2,15 +2,14 @@ import { useState } from "react";
 import Input from "../components/Input";
 import GraphCard from "../components/GraphCard";
 import NumberCard from "../components/NumberCard";
-import TextCard from "../components/TextCard";
 import usePrediction from '../services/usePrediction';
 
 const AnalyzeIt = () => {
     const [selectedModels, setSelectedModels] = useState([]);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [parameters, setParameters] = useState({
-        country: "France",
-        virus: "Covid",
+        country: "",
+        virus: "",
         date_start: "2019-09-01",
         date_end: "2021-03-01"
     });
@@ -19,7 +18,7 @@ const AnalyzeIt = () => {
     const graphs = ["transmission_rate", "mortality_rate", "new_cases", "new_deaths", "geographic_spread"];
     const text = ["peak_date"];
 
-    const { prediction, loading, error } = usePrediction({
+    const { prediction, loading } = usePrediction({
         country: parameters.country,
         virus: parameters.virus,
         dateStart: parameters.date_start,

@@ -1,21 +1,25 @@
 // src/hooks/usePrediction.js
 import { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function usePrediction({ country, virus, dateStart, dateEnd }) {
   const [prediction, setPrediction] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { token } = useAuth();
+  const graphqlUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/graphql';
 
   useEffect(() => {
-    if (!country || !virus || !dateStart || !dateEnd) return;
+    if (!country || !virus || !dateStart || !dateEnd || !token) return;
 
     setLoading(true);
     setError(null);
 
-    fetch('http://localhost:4000/graphql', {
+    fetch(graphqlUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({
         query: `
@@ -40,7 +44,7 @@ query Query {
       })
       .catch((err) => setError(err))
       .finally(() => setLoading(false));
-  }, [country, virus, dateStart, dateEnd]);
+  }, [country, virus, dateStart, dateEnd, token]);
 
   return { prediction, loading, error };
 }

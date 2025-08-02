@@ -1,4 +1,16 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import dataService from '../services/dataService';
+
 export default function Input({ selectedModels, setSelectedModels, parameters, setParameters, isMenuOpen, setIsMenuOpen, fieldTitles }) {
+    const { logout, user, token } = useAuth();
+    const [pays, setPays] = useState([]);
+    const [virus, setVirus] = useState([]);
+    const [loadingData, setLoadingData] = useState(true);
+
+    // Créer un nom d'affichage à partir de nom et prénom
+    const displayName = user ? `${user.prenom || ''} ${user.nom || ''}`.trim() || user.email : '';
+
     const allModels = [
         "total_cases", "total_deaths",
         "peak_date", "estimated_duration_days", "cases_in_30d",
@@ -6,222 +18,46 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
         "transmission_rate", "mortality_rate", "geographic_spread"
     ];
 
-    const allVirus = [
-        "Covid", "Monkeypox"]
+    // Charger les données au montage du composant
+    useEffect(() => {
+        const loadData = async () => {
+            if (!token) return;
 
-    const allPays = [
-        "Afghanistan",
-        "Africa Eastern and Southern",
-        "Africa Western and Central",
-        "Albania",
-        "Algeria",
-        "Andorra",
-        "Angola",
-        "Antigua and Barbuda",
-        "Argentina",
-        "Armenia",
-        "Aruba",
-        "Australia",
-        "Austria",
-        "Azerbaijan",
-        "Bahamas, The",
-        "Bahrain",
-        "Bangladesh",
-        "Barbados",
-        "Belarus",
-        "Belgium",
-        "Belize",
-        "Benin",
-        "Bermuda",
-        "Bhutan",
-        "Bolivia",
-        "Bosnia and Herzegovina",
-        "Botswana",
-        "Brazil",
-        "British Virgin Islands",
-        "Brunei Darussalam",
-        "Bulgaria",
-        "Burkina Faso",
-        "Burundi",
-        "Cabo Verde",
-        "Cambodia",
-        "Cameroon",
-        "Canada",
-        "Cayman Islands",
-        "Central African Republic",
-        "Central Europe and the Baltics",
-        "Chad",
-        "Channel Islands",
-        "Chile",
-        "China",
-        "Colombia",
-        "Comoros",
-        "Congo, Dem. Rep.",
-        "Costa Rica",
-        "Cote d'Ivoire",
-        "Croatia",
-        "Cuba",
-        "Curacao",
-        "Cyprus",
-        "Czechia",
-        "Denmark",
-        "Djibouti",
-        "Dominica",
-        "Dominican Republic",
-        "East Asia & Pacific",
-        "Ecuador",
-        "Egypt, Arab Rep.",
-        "El Salvador",
-        "Equatorial Guinea",
-        "Eritrea",
-        "Estonia",
-        "Ethiopia",
-        "Faroe Islands",
-        "Fiji",
-        "Finland",
-        "Fragile and conflict affected situations",
-        "France",
-        "French Polynesia",
-        "Gabon",
-        "Gambia, The",
-        "Georgia",
-        "Germany",
-        "Ghana",
-        "Gibraltar",
-        "Greece",
-        "Greenland",
-        "Grenada",
-        "Guam",
-        "Guatemala",
-        "Guinea",
-        "Guinea-Bissau",
-        "Guyana",
-        "Haiti",
-        "Honduras",
-        "Hong Kong SAR, China",
-        "Hungary",
-        "Iceland",
-        "India",
-        "Indonesia",
-        "Iran, Islamic Rep.",
-        "Iraq",
-        "Ireland",
-        "Isle of Man",
-        "Israel",
-        "Italy",
-        "Jamaica",
-        "Japan",
-        "Jordan",
-        "Kazakhstan",
-        "Kenya",
-        "Kiribati",
-        "Korea, Dem. People's Rep.",
-        "Kuwait",
-        "Latvia",
-        "Lebanon",
-        "Lesotho",
-        "Liberia",
-        "Libya",
-        "Liechtenstein",
-        "Lithuania",
-        "Luxembourg",
-        "Macao SAR, China",
-        "Madagascar",
-        "Malawi",
-        "Malaysia",
-        "Maldives",
-        "Mali",
-        "Malta",
-        "Marshall Islands",
-        "Mauritania",
-        "Mauritius",
-        "Mexico",
-        "Micronesia, Fed. Sts.",
-        "Moldova",
-        "Monaco",
-        "Mongolia",
-        "Montenegro",
-        "Morocco",
-        "Mozambique",
-        "Myanmar",
-        "Namibia",
-        "Nauru",
-        "Nepal",
-        "Netherlands",
-        "New Caledonia",
-        "New Zealand",
-        "Nicaragua",
-        "Niger",
-        "Nigeria",
-        "North America",
-        "North Macedonia",
-        "Northern Mariana Islands",
-        "Norway",
-        "Oman",
-        "Pakistan",
-        "Palau",
-        "Panama",
-        "Papua New Guinea",
-        "Paraguay",
-        "Peru",
-        "Philippines",
-        "Poland",
-        "Portugal",
-        "Puerto Rico",
-        "Qatar",
-        "Romania",
-        "Russian Federation",
-        "Rwanda",
-        "Samoa",
-        "San Marino",
-        "Sao Tome and Principe",
-        "Saudi Arabia",
-        "Senegal",
-        "Serbia",
-        "Seychelles",
-        "Sierra Leone",
-        "Singapore",
-        "Sint Maarten (Dutch part)",
-        "Slovenia",
-        "Solomon Islands",
-        "Somalia",
-        "South Africa",
-        "South Sudan",
-        "Spain",
-        "Sri Lanka",
-        "St. Kitts and Nevis",
-        "St. Lucia",
-        "St. Martin (French part)",
-        "St. Vincent and the Grenadines",
-        "Sudan",
-        "Suriname",
-        "Sweden",
-        "Switzerland",
-        "Syrian Arab Republic",
-        "Tajikistan",
-        "Tanzania",
-        "Thailand",
-        "Timor-Leste",
-        "Togo",
-        "Tonga",
-        "Trinidad and Tobago",
-        "Tunisia",
-        "Turkiye",
-        "Turks and Caicos Islands",
-        "Uganda",
-        "Ukraine",
-        "United Arab Emirates",
-        "United Kingdom",
-        "United States",
-        "Uruguay",
-        "Uzbekistan",
-        "Vanuatu",
-        "Venezuela, RB",
-        "Vietnam",
-        "World",
-        "Yemen, Rep.",
-        "Zambia",
-        "Zimbabwe"]
+            try {
+                setLoadingData(true);
+                const [paysData, virusData] = await Promise.all([
+                    dataService.getAllPays(token),
+                    dataService.getAllVirus(token)
+                ]);
+
+                setPays(paysData);
+                setVirus(virusData);
+
+                // Si aucun pays n'est sélectionné, prendre le premier
+                if (!parameters.country && paysData.length > 0) {
+                    setParameters(prev => ({
+                        ...prev,
+                        country: paysData[0].nom_pays
+                    }));
+                }
+
+                // Si aucun virus n'est sélectionné, prendre le premier
+                if (!parameters.virus && virusData.length > 0) {
+                    setParameters(prev => ({
+                        ...prev,
+                        virus: virusData[0].nom_virus
+                    }));
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des données:', error);
+            } finally {
+                setLoadingData(false);
+            }
+        };
+
+        loadData();
+    }, [token, parameters.country, parameters.virus, setParameters]);
+
     const handleSetSelectedModels = (model) => {
         setSelectedModels((prev) =>
             prev.includes(model)
@@ -240,7 +76,6 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
 
     return (
         <>
-
             {isMenuOpen && (
                 <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
@@ -248,14 +83,13 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
                 />
             )}
 
-
             <div className={`
                 fixed lg:relative top-0 left-0 h-full w-64 bg-gray-100 text-black p-4 space-y-4 z-50
                 transform transition-transform duration-300 ease-in-out
                 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
-
-                <div className="flex justify-end lg:hidden mb-4">
+                <div className="flex justify-between items-center lg:hidden mb-4">
+                    <span className="text-sm font-medium">Bonjour {displayName}</span>
                     <button
                         onClick={() => setIsMenuOpen(false)}
                         className="text-gray-600 hover:text-gray-800 text-xl font-bold"
@@ -264,44 +98,65 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
                     </button>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium">Pays</label>
-                    <select
-                        name="country"
-                        className="w-full p-1 rounded"
-                        defaultValue={parameters.country}
-                        onChange={handleParameterChange}
-                    >
-                        {allPays.map((pays) => (
-                            <option key={pays} value={pays}>
-                                {pays}
-                            </option>
-                        ))}
-                    </select>
+                <div className="hidden lg:block mb-4">
+                    <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Bonjour {displayName}</span>
+                        <button
+                            onClick={logout}
+                            className="text-xs text-red-600 hover:text-red-800"
+                        >
+                            Déconnexion
+                        </button>
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium">Virus</label>
-                    <select
-                        name="virus"
-                        className="w-full p-1 rounded"
-                        defaultValue={parameters.virus}
-                        onChange={handleParameterChange}
-                    >
-                        {allVirus.map((virus) => (
-                            <option key={virus} value={virus}>
-                                {virus}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                {loadingData ? (
+                    <div className="flex justify-center items-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <span className="ml-2 text-sm text-gray-600">Chargement...</span>
+                    </div>
+                ) : (
+                    <>
+                        <div>
+                            <label className="block text-sm font-medium">Pays</label>
+                            <select
+                                name="country"
+                                className="w-full p-1 rounded"
+                                value={parameters.country}
+                                onChange={handleParameterChange}
+                            >
+                                {pays.map((paysItem) => (
+                                    <option key={paysItem.id_pays} value={paysItem.nom_pays}>
+                                        {paysItem.nom_pays}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium">Virus</label>
+                            <select
+                                name="virus"
+                                className="w-full p-1 rounded"
+                                value={parameters.virus}
+                                onChange={handleParameterChange}
+                            >
+                                {virus.map((virusItem) => (
+                                    <option key={virusItem.id_virus} value={virusItem.nom_virus}>
+                                        {virusItem.nom_virus}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                )}
 
                 <div className="space-y-1">
                     <label className="block text-sm font-medium">Début</label>
                     <input
                         type="date"
                         name="date_start"
-                        defaultValue={parameters.date_start}
+                        value={parameters.date_start}
                         onChange={handleParameterChange}
                         className="w-full border rounded px-2 py-1"
                     />
@@ -309,7 +164,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
                     <input
                         type="date"
                         name="date_end"
-                        defaultValue={parameters.date_end}
+                        value={parameters.date_end}
                         onChange={handleParameterChange}
                         className="w-full border rounded px-2 py-1"
                     />
