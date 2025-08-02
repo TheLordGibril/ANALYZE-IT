@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import typeDefs from "./schema/typeDefs.js";
 import resolvers from "./resolvers/index.js";
 import prisma from "./prisma.js";
+import jwt from "jsonwebtoken";
 
 // Charger les variables d'environnement
 dotenv.config();

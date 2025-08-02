@@ -81,3 +81,16 @@ model StatistiquesGlobales {
   @@unique([id_virus, date], name: "Statistiques_Globales_id_virus_date_key")
   @@map("Statistiques_Globales")
 }
+
+model User {
+  id_user    Int      @id @default(autoincrement())
+  email      String   @unique @db.VarChar(255)
+  password   String   @db.VarChar(255)
+  nom        String?  @db.VarChar(100)
+  prenom     String?  @db.VarChar(100)
+  role       String   @default("USER") @db.VarChar(20) // USER ou ADMIN
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("Users")
+}

@@ -38,6 +38,22 @@ const typeDefs = gql`
     taux_infection_vs_global: Float
     taux_mortalite_pop_vs_global: Float
   }
+  
+  type User {
+  id_user: ID!
+  email: String!
+  nom: String
+  prenom: String
+  role: String!
+  created_at: String!
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+
 
   type Query {
     # Requêtes pour les prédictions de pandémie
@@ -65,6 +81,7 @@ const typeDefs = gql`
     statistiquesByVirus(id_virus: ID!): [StatistiquesJournalieres]
     statistiquesByDate(date: String!): [StatistiquesJournalieres]
     allStatistiques: [StatistiquesJournalieres]
+    me: User
   }
   scalar JSON
 
@@ -99,6 +116,14 @@ const typeDefs = gql`
     ): StatistiquesJournalieres
 
     deleteStatistique(id_stat: ID!): Boolean
+    
+    login(email: String!, password: String!): AuthPayload
+    register(
+      email: String!
+      password: String!
+      nom: String
+      prenom: String
+    ): AuthPayload
   }
 `;
 

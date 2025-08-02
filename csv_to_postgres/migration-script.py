@@ -23,6 +23,21 @@ class MigrationStatus(Base):
     def __repr__(self):
         return f"<MigrationStatus(filename={self.filename}, status={self.status})>"
 
+class User(Base):
+    __tablename__ = "Users"
+
+    id_user = Column(Integer, primary_key=True, autoincrement=True)
+    email = Column(String(255), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
+    nom = Column(String(100), nullable=True)
+    prenom = Column(String(100), nullable=True)
+    role = Column(String(20), default='USER', nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def __repr__(self):
+        return f"<User(id_user={self.id_user}, email={self.email}, role={self.role})>"
+
 class Pays(Base):
     __tablename__ = "Pays"
 
@@ -497,6 +512,7 @@ def verifier_migration_finale(session):
         count_saisons = session.query(Saisons).count()
         count_stats = session.query(StatistiquesJournalieres).count()
         count_global = session.query(StatistiquesGlobales).count()
+        count_users = session.query(User).count()
 
         config.log_info(f"=== RÉSUMÉ DE LA MIGRATION ===")
         config.log_info(f"Pays: {count_pays}")
@@ -504,6 +520,7 @@ def verifier_migration_finale(session):
         config.log_info(f"Saisons: {count_saisons}")
         config.log_info(f"Statistiques journalières: {count_stats}")
         config.log_info(f"Statistiques globales: {count_global}")
+        config.log_info(f"Utilisateurs: {count_users}")
 
         # Vérifications de cohérence
         if count_stats == 0:
