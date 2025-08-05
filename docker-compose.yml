@@ -102,6 +102,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
       PYTHONUNBUFFERED: 1
       GDPR_MODE: true
+      CSV_FILE_PATH: ${CSV_FILE_PATH}
     depends_on:
       postgres-usa:
         condition: service_healthy
@@ -199,6 +200,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
       PYTHONUNBUFFERED: 1
       GDPR_MODE: true
+      CSV_FILE_PATH: ${CSV_FILE_PATH}
     depends_on:
       postgres-france:
         condition: service_healthy
@@ -275,6 +277,7 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-suisse:5432/oms_suisse
       PYTHONUNBUFFERED: 1
       MULTI_LANG: "fr,de,it"
+      CSV_FILE_PATH: ${CSV_FILE_PATH}
     depends_on:
       postgres-suisse:
         condition: service_healthy
