@@ -27,7 +27,7 @@ jobs:
         run: docker compose -f docker-compose.usa.yml up -d
 
       - name: Start Suisse stack
-        run: docker compose -f docker-compose.suisse.yml up -d
+        run: docker compose -f docker-compose.ch.yml up -d
 
       - name: Wait for France frontend
         run: wait-on http://localhost:3002
@@ -49,8 +49,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Cypress tests
-        run: npx cypress run
+      - name: Run Cypress tests USA
+        run: npx cypress run --config baseUrl=http://localhost:3000
+        working-directory: ./cypress
+      - name: Run Cypress tests France
+        run: npx cypress run --config baseUrl=http://localhost:3002
+        working-directory: ./cypress
+
+      - name: Run Cypress tests Suisse
+        run: npx cypress run --config baseUrl=http://localhost:3004
         working-directory: ./cypress
 
       - name: Build and push image to GHCR
