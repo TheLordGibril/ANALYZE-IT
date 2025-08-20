@@ -1,0 +1,151 @@
+networks:
+  usa:
+    driver: bridge
+
+volumes:
+  postgres-usa-data:
+
+
+services:
+  postgres-usa:
+    image: postgres:15-alpine
+    container_name: postgres-usa
+    environment:
+      POSTGRES_DB: oms_usa
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - postgres-usa-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - usa
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-usa-1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-usa-1
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
+      KEY: ${JWT_SECRET}
+      JWT_EXPIRES: ${JWT_EXPIRES}
+      API_IA_URL: ${API_IA_URL_USA}
+      PORT: ${PORT_BACKEND_USA}
+      GDPR_MODE: ${GDPR_MODE_USA}
+      LOCALE: ${LOCALE_USA}
+    depends_on:
+      postgres-usa:
+        condition: service_healthy
+    networks:
+      - usa
+    restart: unless-stopped
+
+  backend-usa-2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-usa-2
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
+      KEY: ${JWT_SECRET}
+      JWT_EXPIRES: ${JWT_EXPIRES}
+      API_IA_URL: ${API_IA_URL_USA}
+      PORT: ${PORT_BACKEND_USA}
+      GDPR_MODE: ${GDPR_MODE_USA}
+      LOCALE: ${LOCALE_USA}
+    depends_on:
+      postgres-usa:
+        condition: service_healthy
+    networks:
+      - usa
+    restart: unless-stopped
+
+  api-ia-usa:
+    build:
+      context: ./ml_api
+      dockerfile: Dockerfile
+    container_name: api-ia-usa
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres-usa:
+        condition: service_healthy
+    networks:
+      - usa
+    restart: unless-stopped
+
+  frontend-usa-1:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL_USA}
+        VITE_COUNTRY: ${VITE_COUNTRY_USA}
+        VITE_LOCALE: ${VITE_LOCALE_USA}
+        VITE_GDPR_MODE: ${VITE_GDPR_MODE_USA}
+    container_name: frontend-usa-1
+    networks:
+      - usa
+    restart: unless-stopped
+
+  frontend-usa-2:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL_USA}
+        VITE_COUNTRY: ${VITE_COUNTRY_USA}
+        VITE_LOCALE: ${VITE_LOCALE_USA}
+        VITE_GDPR_MODE: ${VITE_GDPR_MODE_USA}
+    container_name: frontend-usa-2
+    networks:
+      - usa
+    restart: unless-stopped
+
+  etl-usa:
+    build:
+      context: .
+      dockerfile: ./csv_to_postgres/Dockerfile
+    container_name: etl-usa
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-usa:5432/oms_usa
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+      CSV_FILE_PATH: ${CSV_FILE_PATH}
+    depends_on:
+      postgres-usa:
+        condition: service_healthy
+    networks:
+      - usa
+    restart: unless-stopped
+
+  nginx-usa:
+    image: nginx:alpine
+    container_name: nginx-usa
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-usa-1
+      - backend-usa-2
+      - frontend-usa-1
+      - frontend-usa-2
+    networks:
+      - usa
+    volumes:
+      - ./nginx-usa.conf:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped

@@ -1,5 +1,4 @@
 FROM node:18-alpine
-LABEL authors="kevin"
 
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S backend -u 1001

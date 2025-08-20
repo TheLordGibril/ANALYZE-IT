@@ -1,0 +1,151 @@
+networks:
+  france:
+    driver: bridge
+
+volumes:
+  postgres-france-data:
+
+
+services:
+  postgres-france:
+    image: postgres:15-alpine
+    container_name: postgres-france
+    environment:
+      POSTGRES_DB: oms_france
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_HOST_AUTH_METHOD: md5
+    volumes:
+      - postgres-france-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5433:5432"
+    networks:
+      - france
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-france-1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-france-1
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
+      KEY: ${JWT_SECRET}
+      JWT_EXPIRES: ${JWT_EXPIRES}
+      API_IA_URL: ${API_IA_URL_FR}
+      PORT: ${PORT_BACKEND_FR}
+      GDPR_MODE: ${GDPR_MODE_FR}
+      LOCALE: ${LOCALE_FR}
+    depends_on:
+      postgres-france:
+        condition: service_healthy
+    networks:
+      - france
+    restart: unless-stopped
+
+  backend-france-2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend-france-2
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
+      KEY: ${JWT_SECRET}
+      JWT_EXPIRES: ${JWT_EXPIRES}
+      API_IA_URL: ${API_IA_URL_FR}
+      PORT: ${PORT_BACKEND_FR}
+      GDPR_MODE: ${GDPR_MODE_FR}
+      LOCALE: ${LOCALE_FR}
+    depends_on:
+      postgres-france:
+        condition: service_healthy
+    networks:
+      - france
+    restart: unless-stopped
+
+  api-ia-france:
+    build:
+      context: ./ml_api
+      dockerfile: Dockerfile
+    container_name: api-ia-france
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+    ports:
+      - "8002:8000"
+    depends_on:
+      postgres-france:
+        condition: service_healthy
+    networks:
+      - france
+    restart: unless-stopped
+
+  frontend-france-1:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL_FR}
+        VITE_COUNTRY: ${VITE_COUNTRY_FR}
+        VITE_LOCALE: ${VITE_LOCALE_FR}
+        VITE_GDPR_MODE: ${VITE_GDPR_MODE_FR}
+    container_name: frontend-france-1
+    networks:
+      - france
+    restart: unless-stopped
+
+  frontend-france-2:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL_FR}
+        VITE_COUNTRY: ${VITE_COUNTRY_FR}
+        VITE_LOCALE: ${VITE_LOCALE_FR}
+        VITE_GDPR_MODE: ${VITE_GDPR_MODE_FR}
+    container_name: frontend-france-2
+    networks:
+      - france
+    restart: unless-stopped
+
+  etl-france:
+    build:
+      context: .
+      dockerfile: ./csv_to_postgres/Dockerfile
+    container_name: etl-france
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
+      PYTHONUNBUFFERED: 1
+      GDPR_MODE: true
+      CSV_FILE_PATH: ${CSV_FILE_PATH}
+    depends_on:
+      postgres-france:
+        condition: service_healthy
+    networks:
+      - france
+    restart: unless-stopped
+
+  nginx-france:
+    image: nginx:alpine
+    container_name: nginx-france
+    ports:
+      - "3002:80"
+    depends_on:
+      - backend-france-1
+      - backend-france-2
+      - frontend-france-1
+      - frontend-france-2
+    networks:
+      - france
+    volumes:
+      - ./nginx-france.conf:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped

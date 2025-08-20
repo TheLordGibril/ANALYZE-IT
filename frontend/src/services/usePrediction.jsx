@@ -7,7 +7,7 @@ export default function usePrediction({ country, virus, dateStart, dateEnd }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { token } = useAuth();
-  const graphqlUrl = import.meta.env.VITE_API_URL || 'http://localhost:4000/graphql';
+  const graphqlUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     if (!country || !virus || !dateStart || !dateEnd || !token) return;
