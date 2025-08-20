@@ -1,7 +1,7 @@
 describe('Tests responsive', () => {
     beforeEach(() => {
         cy.mockApiCall()
-        cy.visit(baseUrl, {
+        cy.visit('/', {
             timeout: 30000,
             failOnStatusCode: false
         })

@@ -1,15 +1,17 @@
 const { defineConfig } = require("cypress");
 
+const baseUrl = process.env.CYPRESS_BASE_URL
+
 module.exports = defineConfig({
   e2e: {
-    baseUrl: process.env.CYPRESS_BASE_URL,
+    baseUrl,
     setupNodeEvents(on, config) {
       require('@cypress/code-coverage/task')(on, config)
       return config
     },
     env: {
       codeCoverage: {
-        url: 'http://localhost:5173/__coverage__'
+        url: `${baseUrl}/__coverage__`
       }
     },
   },
