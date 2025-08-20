@@ -1,0 +1,64 @@
+name: CI - Cypress & Publish
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install wait-on
+        run: npm install -g wait-on
+
+      - name: Start France stack
+        run: docker compose -f docker-compose.fr.yml up -d
+
+      - name: Start USA stack
+        run: docker compose -f docker-compose.usa.yml up -d
+
+      - name: Start Suisse stack
+        run: docker compose -f docker-compose.suisse.yml up -d
+
+      - name: Wait for France frontend
+        run: wait-on http://localhost:3002
+
+      - name: Wait for USA frontend
+        run: wait-on http://localhost:3000
+
+      - name: Wait for Suisse frontend
+        run: wait-on http://localhost:3004
+
+      - name: Install Cypress dependencies
+        run: npm ci
+        working-directory: ./cypress
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Cypress tests
+        run: npx cypress run
+        working-directory: ./cypress
+
+      - name: Build and push image to GHCR
+        if: success()
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/frontend-usa:latest -f frontend/Dockerfile ./frontend
+          docker push ghcr.io/${{ github.repository }}/frontend-usa:latest
+          docker build -t ghcr.io/${{ github.repository }}/frontend-france:latest -f frontend/Dockerfile ./frontend
+          docker push ghcr.io/${{ github.repository }}/frontend-france:latest
+          docker build -t ghcr.io/${{ github.repository }}/frontend-suisse:latest -f frontend/Dockerfile ./frontend
+          docker push ghcr.io/${{ github.repository }}/frontend-suisse:latest
