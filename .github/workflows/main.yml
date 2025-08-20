@@ -50,15 +50,21 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Cypress tests USA
-        run: npx cypress run --config baseUrl=http://localhost:3000
+        run: npx cypress run
         working-directory: ./cypress
+        env:
+          CYPRESS_BASE_URL: http://localhost:3000
       - name: Run Cypress tests France
-        run: npx cypress run --config baseUrl=http://localhost:3002
+        run: npx cypress run
         working-directory: ./cypress
+        env:
+          CYPRESS_BASE_URL: http://localhost:3002
 
       - name: Run Cypress tests Suisse
-        run: npx cypress run --config baseUrl=http://localhost:3004
+        run: npx cypress run
         working-directory: ./cypress
+        env:
+          CYPRESS_BASE_URL: http://localhost:3004
 
       - name: Build and push image to GHCR
         if: success()
