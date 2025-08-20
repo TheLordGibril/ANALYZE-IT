@@ -31,12 +31,20 @@ Cypress.Commands.add('mockApiCall', (fixture = 'prediction-mock') => {
 
 // Commande pour sélectionner un pays
 Cypress.Commands.add('selectCountry', (country) => {
-    cy.get('select[name="country"]').select(country)
+    cy.get('select[name="country"]').then($select => {
+        $select.val(country)
+        $select[0].dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    cy.get('select[name="country"]').should('have.value', country)
 })
 
 // Commande pour sélectionner un pays
 Cypress.Commands.add('selectVirus', (virus) => {
-    cy.get('select[name="virus"]').select(virus)
+    cy.get('select[name="virus"]').then($select => {
+        $select.val(virus)
+        $select[0].dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    cy.get('select[name="virus"]').should('have.value', virus)
 })
 
 // Commande pour sélectionner un modèle

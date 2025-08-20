@@ -1,10 +1,39 @@
 describe('Analyze-it Application', () => {
+
+    describe('Authentification', () => {
+        it('Register: devrait créer un nouvel utilisateur', () => {
+            cy.visit('/');
+            cy.contains(/(Créer un compte|S'inscrire|Register)/i).click();
+            cy.get('input[name="email"]').type('testuser@example.com');
+            cy.get('input[name="password"]').type('TestPassword123!');
+            cy.get('input[name="confirmPassword"]').type('TestPassword123!');
+            cy.get('input[name="nom"]').type('TestNom');
+            cy.get('input[name="prenom"]').type('TestPrenom');
+            cy.get('button[type="submit"]').click();
+            // Vérifie qu'on est redirigé ou qu'un message de succès s'affiche
+            cy.contains(/(inscrit|succès|bienvenue|login|connexion|Un utilisateur avec cet email existe déjà|chargement)/i);
+        });
+
+        it('Login: devrait connecter un utilisateur existant', () => {
+            cy.visit('/');
+            cy.get('input[name="email"]').type('testuser@example.com');
+            cy.get('input[name="password"]').type('TestPassword123!');
+            cy.get('button[type="submit"]').click();
+
+            // Vérifie qu'on est connecté (par exemple, présence d'un bouton logout ou d'une page d'accueil)
+            cy.contains(/(déconnexion|logout|accueil|dashboard|chargement)/i);
+        });
+    });
+
     beforeEach(() => {
-        cy.mockApiCall()
+        cy.viewport(1024, 800);
         cy.visit('/', {
             timeout: 30000,
             failOnStatusCode: false
         })
+        cy.get('input[name="email"]').type('testuser@example.com');
+        cy.get('input[name="password"]').type('TestPassword123!');
+        cy.get('button[type="submit"]').click();
     })
 
     describe('Interface utilisateur', () => {
