@@ -69,9 +69,10 @@ jobs:
       - name: Build and push image to GHCR
         if: success()
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/frontend-usa:latest -f frontend/Dockerfile ./frontend
-          docker push ghcr.io/${{ github.repository }}/frontend-usa:latest
-          docker build -t ghcr.io/${{ github.repository }}/frontend-france:latest -f frontend/Dockerfile ./frontend
-          docker push ghcr.io/${{ github.repository }}/frontend-france:latest
-          docker build -t ghcr.io/${{ github.repository }}/frontend-suisse:latest -f frontend/Dockerfile ./frontend
-          docker push ghcr.io/${{ github.repository }}/frontend-suisse:latest
+          REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/${REPO_LC}/frontend-usa:latest -f frontend/Dockerfile ./frontend
+          docker push ghcr.io/${REPO_LC}/frontend-usa:latest
+          docker build -t ghcr.io/${REPO_LC}/frontend-france:latest -f frontend/Dockerfile ./frontend
+          docker push ghcr.io/${REPO_LC}/frontend-france:latest
+          docker build -t ghcr.io/${REPO_LC}/frontend-suisse:latest -f frontend/Dockerfile ./frontend
+          docker push ghcr.io/${REPO_LC}/frontend-suisse:latest
