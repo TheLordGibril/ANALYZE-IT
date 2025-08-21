@@ -6,7 +6,7 @@ csv_to_postgres/__pycache__/
 csv_to_postgres/venv-bdd/
 .idea/
 cypress/node_modules/
-cypress/.nyc_output
+cypress/.nyc_output/
 cypress/coverage/
 cypress/cypress/screenshots/
 cypress/cypress/videos/

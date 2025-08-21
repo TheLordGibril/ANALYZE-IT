@@ -57,7 +57,7 @@ describe('Analyze-it Application', () => {
         })
 
         it('devrait permettre de modifier le nom du virus', () => {
-            cy.get('select[name="virus"]').select('Monkeypox')
+            cy.selectVirus('Monkeypox')
             cy.get('select[name="virus"]').should('have.value', 'Monkeypox')
         })
 
