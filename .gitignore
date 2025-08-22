@@ -11,3 +11,4 @@ cypress/coverage/
 cypress/cypress/screenshots/
 cypress/cypress/videos/
 .env
+.vscode/
