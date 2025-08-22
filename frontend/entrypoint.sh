@@ -1,15 +1,14 @@
 #!/bin/sh
-# entrypoint.sh
 
 # Chemin du fichier JS qui sera utilisé par le frontend
-ENV_FILE=/usr/share/nginx/html/env-config.js
+ENV_FILE=/usr/share/nginx/html/env.js
 
-echo "Génération de env-config.js à partir des variables d'environnement…"
+echo "Génération de env.js à partir des variables d'environnement…"
 
 # Commence le fichier
 echo "window.__ENV__ = {" > $ENV_FILE
 
-# Parcours toutes les variables d'environnement et les écrit
+# Parcourt toutes les variables d'environnement et les écrit
 env | while IFS='=' read -r name value; do
   # Filtrer si besoin les variables à exposer
   case "$name" in
