@@ -1,4 +1,4 @@
-const graphqlUrl = import.meta.env.VITE_API_URL;
+const graphqlUrl = window.__ENV__.VITE_API_URL;
 
 const dataService = {
     getAllPays: async (token) => {

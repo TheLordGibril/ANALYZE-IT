@@ -93,12 +93,12 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL_CH}
-        VITE_COUNTRY: ${VITE_COUNTRY_CH}
-        VITE_LOCALE: ${VITE_LOCALE_CH}
-        VITE_GDPR_MODE: ${VITE_GDPR_MODE_CH}
-        VITE_MULTI_LANG: ${VITE_MULTI_LANG_CH}
+    environment:
+      VITE_API_URL: ${VITE_API_URL_CH}
+      VITE_COUNTRY: ${VITE_COUNTRY_CH}
+      VITE_LOCALE: ${VITE_LOCALE_CH}
+      VITE_GDPR_MODE: ${VITE_GDPR_MODE_CH}
+      VITE_MULTI_LANG: ${VITE_MULTI_LANG_CH}
     container_name: frontend-suisse-1
     networks:
       - suisse
@@ -108,12 +108,12 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL_CH}
-        VITE_COUNTRY: ${VITE_COUNTRY_CH}
-        VITE_LOCALE: ${VITE_LOCALE_CH}
-        VITE_GDPR_MODE: ${VITE_GDPR_MODE_CH}
-        VITE_MULTI_LANG: ${VITE_MULTI_LANG_CH}
+    environment:
+      VITE_API_URL: ${VITE_API_URL_CH}
+      VITE_COUNTRY: ${VITE_COUNTRY_CH}
+      VITE_LOCALE: ${VITE_LOCALE_CH}
+      VITE_GDPR_MODE: ${VITE_GDPR_MODE_CH}
+      VITE_MULTI_LANG: ${VITE_MULTI_LANG_CH}
     container_name: frontend-suisse-2
     networks:
       - suisse
