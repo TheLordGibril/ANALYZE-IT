@@ -15,8 +15,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: npm install
+      - name: Install frontend dependencies
         run: npm ci
+        working-directory: ./frontend
       
       - name: Lint frontend
         run: npx eslint src/ --format html -o reports/frontend/lint.html
@@ -27,6 +28,10 @@ jobs:
         with:
           name: frontend-lint-report
           path: reports/frontend/lint.html
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: ./backend
 
       - name: Lint backend Apollo
         run: npx eslint src/ --format html -o reports/backend/lint.html
