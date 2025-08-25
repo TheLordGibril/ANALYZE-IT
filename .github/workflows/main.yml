@@ -8,7 +8,7 @@ on:
 
 jobs:
 
-  cypress-tests:
+  tests:
     if: github.ref == 'refs/heads/develop' || github.event.pull_request.base.ref == 'develop'
     runs-on: ubuntu-latest
     steps:
@@ -17,6 +17,36 @@ jobs:
 
       - name: Install wait-on
         run: npm install -g wait-on
+      
+      - name: Lint frontend
+        run: npx eslint frontend/src/ --format html -o reports/frontend/lint.html
+
+      - name: Upload lint reports frontend
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-lint-report
+          path: reports/frontend/lint.html
+
+      - name: Lint backend Apollo
+        run: npx eslint backend/src/ --format html -o reports/backend/lint.html
+
+      - name: Upload lint reports backend Apollo
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-apollo-lint-report
+          path: reports/backend/lint.html
+
+      - name: Lint API IA
+        run: |
+          python3 -m pip install flake8 flake8-html
+          flake8 app.py config.py generate_benchmark_report.py model_comparison.py predict.py train_all_models.py --format=html --htmldir=reports/ml_api
+        working-directory: ./ml_api
+
+      - name: Upload lint reports API IA
+        uses: actions/upload-artifact@v3
+        with:
+          name: ml-api-lint-report
+          path: reports/ml_api/
 
       - name: Start France stack
         run: docker compose -f docker-compose.fr.yml up -d
@@ -32,21 +62,37 @@ jobs:
         working-directory: ./cypress
 
       - name: Run Cypress tests USA
-        run: npx cypress run
+        run: |
+          mkdir -p reports/frontend/cypress/usa
+          npx cypress run --config-file cypress.config.js 
+            --reporter mocha-multi-reporters --reporter-options configFile=reporter-config.json
         working-directory: ./cypress
         env:
           CYPRESS_BASE_URL: http://localhost:3000
+
       - name: Run Cypress tests France
-        run: npx cypress run
+        run: |
+          mkdir -p reports/frontend/cypress/france
+          npx cypress run --config-file cypress.config.js 
+            --reporter mocha-multi-reporters --reporter-options configFile=reporter-config.json
         working-directory: ./cypress
         env:
           CYPRESS_BASE_URL: http://localhost:3002
 
       - name: Run Cypress tests Suisse
-        run: npx cypress run
+        run: |
+          mkdir -p reports/frontend/cypress/suisse
+          npx cypress run --config-file cypress.config.js 
+            --reporter mocha-multi-reporters --reporter-options configFile=reporter-config.json
         working-directory: ./cypress
         env:
           CYPRESS_BASE_URL: http://localhost:3004
+
+      - name: Upload Cypress reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-cypress-reports
+          path: reports/frontend/cypress/
 
   build-and-push:
     if: github.ref == 'refs/heads/main' || github.event.pull_request.base.ref == 'main'

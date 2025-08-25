@@ -4,6 +4,9 @@ networks:
 
 volumes:
   postgres-france-data:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
 
 
 services:
@@ -138,7 +141,7 @@ services:
     image: nginx:alpine
     container_name: nginx-france
     ports:
-      - "3002:80"
+      - "3002:3002"
     depends_on:
       - backend-france-1
       - backend-france-2
@@ -148,4 +151,16 @@ services:
       - france
     volumes:
       - ./nginx-france.conf:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped
+
+  cadvisor-france:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8082:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/snap/docker/common/var-lib-docker:/var/lib/docker:ro
     restart: unless-stopped

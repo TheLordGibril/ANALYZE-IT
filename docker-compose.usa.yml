@@ -4,7 +4,9 @@ networks:
 
 volumes:
   postgres-usa-data:
-
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:
 
 services:
   postgres-usa:
@@ -138,7 +140,7 @@ services:
     image: nginx:alpine
     container_name: nginx-usa
     ports:
-      - "3000:80"
+      - "3000:3000"
     depends_on:
       - backend-usa-1
       - backend-usa-2
@@ -148,4 +150,16 @@ services:
       - usa
     volumes:
       - ./nginx-usa.conf:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped
+
+  cadvisor-usa:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/snap/docker/common/var-lib-docker:/var/lib/docker:ro
     restart: unless-stopped
