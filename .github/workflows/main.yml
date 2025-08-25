@@ -15,8 +15,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install wait-on
-        run: npm install -g wait-on
+      - name: npm install
+        run: npm ci
       
       - name: Lint frontend
         run: npx eslint src/ --format html -o reports/frontend/lint.html
