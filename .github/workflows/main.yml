@@ -27,7 +27,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-lint-report
-          path: reports/frontend/lint.html
+          path: frontend/reports/frontend/lint.html
 
       - name: Install backend dependencies
         run: npm ci
@@ -54,7 +54,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ml-api-lint-report
-          path: reports/ml_api/
+          path: ml_api/reports/ml_api/
 
       - name: Start France stack
         run: docker compose -f docker-compose.fr.yml up -d
