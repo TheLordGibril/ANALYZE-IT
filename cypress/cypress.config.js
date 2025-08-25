@@ -3,10 +3,6 @@ const { defineConfig } = require("cypress");
 const baseUrl = process.env.CYPRESS_BASE_URL
 // const baseUrl = 'http://localhost:3000';
 
-console.log(`--------------------------------------------: ${baseUrl}`);
-console.log(`Using base URL: ${baseUrl}`);
-console.log(`--------------------------------------------: ${baseUrl}`);
-
 module.exports = defineConfig({
   e2e: {
     baseUrl,

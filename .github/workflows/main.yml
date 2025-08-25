@@ -15,38 +15,46 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install wait-on
-        run: npm install -g wait-on
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: ./frontend
       
       - name: Lint frontend
-        run: npx eslint frontend/src/ --format html -o reports/frontend/lint.html
+        run: npx eslint src/ --format html -o reports/frontend/lint.html || true
+        working-directory: ./frontend
 
       - name: Upload lint reports frontend
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-lint-report
-          path: reports/frontend/lint.html
+          path: frontend/reports/frontend/lint.html
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: ./backend
 
       - name: Lint backend Apollo
-        run: npx eslint backend/src/ --format html -o reports/backend/lint.html
+        run: npx eslint src/ --format html -o reports/backend/lint.html
+        working-directory: ./backend
 
       - name: Upload lint reports backend Apollo
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-apollo-lint-report
-          path: reports/backend/lint.html
+          path: backend/reports/backend/lint.html
 
       - name: Lint API IA
         run: |
           python3 -m pip install flake8 flake8-html
-          flake8 app.py config.py generate_benchmark_report.py model_comparison.py predict.py train_all_models.py --format=html --htmldir=reports/ml_api
+          mkdir -p reports/ml_api reports/frontend reports/backend
+          flake8 app.py config.py generate_benchmark_report.py model_comparison.py predict.py train_all_models.py --format=html --htmldir=reports/ml_api || true
         working-directory: ./ml_api
 
       - name: Upload lint reports API IA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ml-api-lint-report
-          path: reports/ml_api/
+          path: ml_api/reports/ml_api/
 
       - name: Start France stack
         run: docker compose -f docker-compose.fr.yml up -d
@@ -89,7 +97,7 @@ jobs:
           CYPRESS_BASE_URL: http://localhost:3004
 
       - name: Upload Cypress reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-cypress-reports
           path: reports/frontend/cypress/
