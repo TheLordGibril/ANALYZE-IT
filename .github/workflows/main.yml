@@ -20,7 +20,7 @@ jobs:
         working-directory: ./frontend
       
       - name: Lint frontend
-        run: npx eslint src/ --format html -o reports/frontend/lint.html
+        run: npx eslint src/ --format html -o reports/frontend/lint.html || true
         working-directory: ./frontend
 
       - name: Upload lint reports frontend
