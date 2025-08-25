@@ -8,3 +8,5 @@ scikit-learn==1.7.0
 dotenv
 psycopg2-binary
 fpdf2
+flake8
+flake8-html
