@@ -46,6 +46,7 @@ jobs:
       - name: Lint API IA
         run: |
           python3 -m pip install flake8 flake8-html
+          mkdir -p reports/ml_api reports/frontend reports/backend
           flake8 app.py config.py generate_benchmark_report.py model_comparison.py predict.py train_all_models.py --format=html --htmldir=reports/ml_api
         working-directory: ./ml_api
 
