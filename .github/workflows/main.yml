@@ -22,7 +22,7 @@ jobs:
         run: npx eslint frontend/src/ --format html -o reports/frontend/lint.html
 
       - name: Upload lint reports frontend
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-lint-report
           path: reports/frontend/lint.html
@@ -31,7 +31,7 @@ jobs:
         run: npx eslint backend/src/ --format html -o reports/backend/lint.html
 
       - name: Upload lint reports backend Apollo
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-apollo-lint-report
           path: reports/backend/lint.html
@@ -43,7 +43,7 @@ jobs:
         working-directory: ./ml_api
 
       - name: Upload lint reports API IA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ml-api-lint-report
           path: reports/ml_api/
@@ -89,7 +89,7 @@ jobs:
           CYPRESS_BASE_URL: http://localhost:3004
 
       - name: Upload Cypress reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-cypress-reports
           path: reports/frontend/cypress/
