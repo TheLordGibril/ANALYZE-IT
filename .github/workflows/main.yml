@@ -19,7 +19,8 @@ jobs:
         run: npm install -g wait-on
       
       - name: Lint frontend
-        run: npx eslint frontend/src/ --format html -o reports/frontend/lint.html
+        run: npx eslint src/ --format html -o reports/frontend/lint.html
+        working-directory: ./frontend
 
       - name: Upload lint reports frontend
         uses: actions/upload-artifact@v4
@@ -28,7 +29,8 @@ jobs:
           path: reports/frontend/lint.html
 
       - name: Lint backend Apollo
-        run: npx eslint backend/src/ --format html -o reports/backend/lint.html
+        run: npx eslint src/ --format html -o reports/backend/lint.html
+        working-directory: ./backend
 
       - name: Upload lint reports backend Apollo
         uses: actions/upload-artifact@v4
