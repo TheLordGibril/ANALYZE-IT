@@ -26,6 +26,8 @@
     "prisma": "^6.5.0"
   },
   "devDependencies": {
+    "eslint": "^9.34.0",
+    "globals": "^16.3.0",
     "nodemon": "^3.1.9"
   }
 }

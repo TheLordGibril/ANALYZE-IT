@@ -12,3 +12,6 @@ cypress/cypress/screenshots/
 cypress/cypress/videos/
 .env
 .vscode/
+ml_api/reports/
+frontend/reports/
+backend/reports/
