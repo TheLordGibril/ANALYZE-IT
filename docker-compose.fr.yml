@@ -4,9 +4,6 @@ networks:
 
 volumes:
   postgres-france-data:
-  sonarqube_data:
-  sonarqube_logs:
-  sonarqube_extensions:
 
 
 services:
@@ -32,47 +29,6 @@ services:
       timeout: 10s
       retries: 3
 
-  backend-france-1:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend-france-1
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
-      KEY: ${JWT_SECRET}
-      JWT_EXPIRES: ${JWT_EXPIRES}
-      API_IA_URL: ${API_IA_URL_FR}
-      PORT: ${PORT_BACKEND_FR}
-      GDPR_MODE: ${GDPR_MODE_FR}
-      LOCALE: ${LOCALE_FR}
-    depends_on:
-      postgres-france:
-        condition: service_healthy
-    networks:
-      - france
-    restart: unless-stopped
-
-  backend-france-2:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend-france-2
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-france:5432/oms_france
-      KEY: ${JWT_SECRET}
-      JWT_EXPIRES: ${JWT_EXPIRES}
-      API_IA_URL: ${API_IA_URL_FR}
-      PORT: ${PORT_BACKEND_FR}
-      GDPR_MODE: ${GDPR_MODE_FR}
-      LOCALE: ${LOCALE_FR}
-    depends_on:
-      postgres-france:
-        condition: service_healthy
-    networks:
-      - france
-    restart: unless-stopped
 
   api-ia-france:
     build:
@@ -96,11 +52,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL_FR}
-        VITE_COUNTRY: ${VITE_COUNTRY_FR}
-        VITE_LOCALE: ${VITE_LOCALE_FR}
-        VITE_GDPR_MODE: ${VITE_GDPR_MODE_FR}
+    environment:
+      VITE_API_URL: ${VITE_API_URL_FR}
+      VITE_COUNTRY: ${VITE_COUNTRY_FR}
+      VITE_LOCALE: ${VITE_LOCALE_FR}
+      VITE_GDPR_MODE: ${VITE_GDPR_MODE_FR}
     container_name: frontend-france-1
     networks:
       - france
@@ -110,11 +66,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL_FR}
-        VITE_COUNTRY: ${VITE_COUNTRY_FR}
-        VITE_LOCALE: ${VITE_LOCALE_FR}
-        VITE_GDPR_MODE: ${VITE_GDPR_MODE_FR}
+    environment:
+      VITE_API_URL: ${VITE_API_URL_FR}
+      VITE_COUNTRY: ${VITE_COUNTRY_FR}
+      VITE_LOCALE: ${VITE_LOCALE_FR}
+      VITE_GDPR_MODE: ${VITE_GDPR_MODE_FR}
     container_name: frontend-france-2
     networks:
       - france
@@ -143,10 +99,9 @@ services:
     ports:
       - "3002:3002"
     depends_on:
-      - backend-france-1
-      - backend-france-2
       - frontend-france-1
       - frontend-france-2
+      - api-ia-france
     networks:
       - france
     volumes:

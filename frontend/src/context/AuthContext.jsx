@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import authService from '../services/authService';
 
 const AuthContext = createContext();
@@ -16,14 +16,22 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    const selectedCountry = window.__ENV__.VITE_COUNTRY;
+    const isAuthRequired = selectedCountry === "USA";
+    const isAuthenticated = isAuthRequired ? !!token : true;
+
     useEffect(() => {
+        if (!isAuthRequired) {
+            setLoading(false);
+            return;
+        }
         const auth = authService.getCurrentUser();
         if (auth) {
             setUser(auth.user);
             setToken(auth.token);
         }
         setLoading(false);
-    }, []);
+    }, [isAuthRequired]);
 
     const login = async (email, password) => {
         const data = await authService.login(email, password);
@@ -51,7 +59,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         logout,
-        isAuthenticated: !!token
+        isAuthenticated,
+        isAuthRequired
     };
 
     if (loading) {

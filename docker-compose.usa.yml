@@ -4,9 +4,6 @@ networks:
 
 volumes:
   postgres-usa-data:
-  sonarqube_data:
-  sonarqube_logs:
-  sonarqube_extensions:
 
 services:
   postgres-usa:
@@ -95,11 +92,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL_USA}
-        VITE_COUNTRY: ${VITE_COUNTRY_USA}
-        VITE_LOCALE: ${VITE_LOCALE_USA}
-        VITE_GDPR_MODE: ${VITE_GDPR_MODE_USA}
+    environment:
+      VITE_API_URL: ${VITE_API_URL_USA}
+      VITE_COUNTRY: ${VITE_COUNTRY_USA}
+      VITE_LOCALE: ${VITE_LOCALE_USA}
+      VITE_GDPR_MODE: ${VITE_GDPR_MODE_USA}
     container_name: frontend-usa-1
     networks:
       - usa
@@ -109,11 +106,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL_USA}
-        VITE_COUNTRY: ${VITE_COUNTRY_USA}
-        VITE_LOCALE: ${VITE_LOCALE_USA}
-        VITE_GDPR_MODE: ${VITE_GDPR_MODE_USA}
+    environment:
+      VITE_API_URL: ${VITE_API_URL_USA}
+      VITE_COUNTRY: ${VITE_COUNTRY_USA}
+      VITE_LOCALE: ${VITE_LOCALE_USA}
+      VITE_GDPR_MODE: ${VITE_GDPR_MODE_USA}
     container_name: frontend-usa-2
     networks:
       - usa

@@ -2,14 +2,14 @@ import './App.css'
 import AnalyzeIt from './pages/Home'
 import Login from './pages/Login';
 import Register from './pages/Register';
-import {AuthProvider, useAuth} from "./context/AuthContext.jsx";
-import {useState} from "react";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import { useState } from "react";
 
 const AuthWrapper = () => {
     const [isLogin, setIsLogin] = useState(true);
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, isAuthRequired } = useAuth();
 
-    if (isAuthenticated) {
+    if (!isAuthRequired || isAuthenticated) {
         return <AnalyzeIt />;
     }
 
