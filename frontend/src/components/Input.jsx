@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import dataService from '../services/dataService';
 
 export default function Input({ selectedModels, setSelectedModels, parameters, setParameters, isMenuOpen, setIsMenuOpen, fieldTitles }) {
-    const { logout, user, token } = useAuth();
+    const { logout, user, token, isAuthRequired } = useAuth();
     const [pays, setPays] = useState([]);
     const [virus, setVirus] = useState([]);
     const [loadingData, setLoadingData] = useState(true);
@@ -21,7 +21,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
     // Charger les données au montage du composant
     useEffect(() => {
         const loadData = async () => {
-            if (!token) return;
+            if (isAuthRequired && !token) return;
 
             try {
                 setLoadingData(true);
@@ -56,7 +56,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
         };
 
         loadData();
-    }, [token, parameters.country, parameters.virus, setParameters]);
+    }, [token, parameters.country, parameters.virus, setParameters, isAuthRequired]);
 
     const handleSetSelectedModels = (model) => {
         setSelectedModels((prev) =>
@@ -88,27 +88,31 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
                 transform transition-transform duration-300 ease-in-out
                 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
             `}>
-                <div className="flex justify-between items-center lg:hidden mb-4">
-                    <span className="text-sm font-medium">Bonjour {displayName}</span>
-                    <button
-                        onClick={() => setIsMenuOpen(false)}
-                        className="text-gray-600 hover:text-gray-800 text-xl font-bold"
-                    >
-                        ×
-                    </button>
-                </div>
+                {isAuthRequired && (
+                    <>
+                        <div className="flex justify-between items-center lg:hidden mb-4">
+                            <span className="text-sm font-medium">Bonjour {displayName}</span>
+                            <button
+                                onClick={() => setIsMenuOpen(false)}
+                                className="text-gray-600 hover:text-gray-800 text-xl font-bold"
+                            >
+                                ×
+                            </button>
+                        </div>
 
-                <div className="hidden lg:block mb-4">
-                    <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Bonjour {displayName}</span>
-                        <button
-                            onClick={logout}
-                            className="text-xs text-red-600 hover:text-red-800"
-                        >
-                            Déconnexion
-                        </button>
-                    </div>
-                </div>
+                        <div className="hidden lg:block mb-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium">Bonjour {displayName}</span>
+                                <button
+                                    onClick={logout}
+                                    className="text-xs text-red-600 hover:text-red-800"
+                                >
+                                    Déconnexion
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
 
                 {loadingData ? (
                     <div className="flex justify-center items-center py-8">
@@ -126,7 +130,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
                                 onChange={handleParameterChange}
                             >
                                 {pays.map((paysItem) => (
-                                    <option key={paysItem.id_pays} value={paysItem.nom_pays}>
+                                    <option key={paysItem.id_pays || paysItem.nom_pays} value={paysItem.nom_pays}>
                                         {paysItem.nom_pays}
                                     </option>
                                 ))}
@@ -142,7 +146,7 @@ export default function Input({ selectedModels, setSelectedModels, parameters, s
                                 onChange={handleParameterChange}
                             >
                                 {virus.map((virusItem) => (
-                                    <option key={virusItem.id_virus} value={virusItem.nom_virus}>
+                                    <option key={virusItem.id_virus || virusItem.nom_virus} value={virusItem.nom_virus}>
                                         {virusItem.nom_virus}
                                     </option>
                                 ))}

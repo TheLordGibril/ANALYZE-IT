@@ -4,9 +4,6 @@ networks:
 
 volumes:
   postgres-suisse-data:
-  sonarqube_data:
-  sonarqube_logs:
-  sonarqube_extensions:
 
 
 services:
@@ -32,47 +29,6 @@ services:
       timeout: 10s
       retries: 3
 
-  backend-suisse-1:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend-suisse-1
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-suisse:5432/oms_suisse
-      KEY: ${JWT_SECRET}
-      JWT_EXPIRES: ${JWT_EXPIRES}
-      API_IA_URL: ${API_IA_URL_CH}
-      PORT: ${PORT_BACKEND_CH}
-      GDPR_MODE: ${GDPR_MODE_CH}
-      LOCALE: ${LOCALE_CH}
-    depends_on:
-      postgres-suisse:
-        condition: service_healthy
-    networks:
-      - suisse
-    restart: unless-stopped
-
-  backend-suisse-2:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: backend-suisse-2
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-password}@postgres-suisse:5432/oms_suisse
-      KEY: ${JWT_SECRET}
-      JWT_EXPIRES: ${JWT_EXPIRES}
-      API_IA_URL: ${API_IA_URL_CH}
-      PORT: ${PORT_BACKEND_CH}
-      GDPR_MODE: ${GDPR_MODE_CH}
-      LOCALE: ${LOCALE_CH}
-    depends_on:
-      postgres-suisse:
-        condition: service_healthy
-    networks:
-      - suisse
-    restart: unless-stopped
 
   api-ia-suisse:
     build:
@@ -145,10 +101,9 @@ services:
     ports:
       - "3004:3004"
     depends_on:
-      - backend-suisse-1
-      - backend-suisse-2
       - frontend-suisse-1
       - frontend-suisse-2
+      - api-ia-suisse
     networks:
       - suisse
     volumes:
@@ -157,7 +112,7 @@ services:
 
   cadvisor-suisse:
     image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
+    container_name: cadvisor-suisse
     ports:
       - "8084:8080"
     volumes:
