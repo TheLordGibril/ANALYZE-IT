@@ -157,7 +157,7 @@ services:
 
   cadvisor-suisse:
     image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
+    container_name: cadvisor-suisse
     ports:
       - "8084:8080"
     volumes:
