@@ -1,4 +1,7 @@
 describe('Analyze-it Application', () => {
+        beforeEach(() => {
+        cy.viewport(1920,1080)
+    })
 
     describe('Authentification', () => {
         it('Register: devrait créer un nouvel utilisateur', () => {

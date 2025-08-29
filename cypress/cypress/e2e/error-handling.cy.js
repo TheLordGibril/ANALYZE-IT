@@ -1,5 +1,6 @@
 describe('Gestion des erreurs', () => {
     beforeEach(() => {
+        cy.viewport(1920,1080)
         cy.visit('/', {
             timeout: 30000,
             failOnStatusCode: false
