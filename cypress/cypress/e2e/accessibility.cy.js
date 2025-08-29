@@ -1,5 +1,6 @@
 describe('Tests d\'accessibilité', () => {
     beforeEach(() => {
+        cy.viewport(1920,1080)
         cy.mockApiCall()
         cy.visit('/', {
             timeout: 30000,
