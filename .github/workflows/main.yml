@@ -116,24 +116,62 @@ jobs:
       - run: |
           REPO_LC=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
 
-          # Backend
-          docker build -t ghcr.io/${REPO_LC}/backend-suisse:latest -f backend/Dockerfile ./backend
-          docker push ghcr.io/${REPO_LC}/backend-suisse:latest
+          # France
+          if [ "${VITE_COUNTRY}" = "FR" ]; then
+            docker build -t ghcr.io/${REPO_LC}/backend-france:latest -f backend/Dockerfile ./backend
+            docker push ghcr.io/${REPO_LC}/backend-france:latest
 
-          # API IA
-          docker build -t ghcr.io/${REPO_LC}/api-ia-suisse:latest -f ml_api/Dockerfile ./ml_api
-          docker push ghcr.io/${REPO_LC}/api-ia-suisse:latest
+            docker build -t ghcr.io/${REPO_LC}/api-ia-france:latest -f ml_api/Dockerfile ./ml_api
+            docker push ghcr.io/${REPO_LC}/api-ia-france:latest
 
-          # Frontend
-          docker build -t ghcr.io/${REPO_LC}/frontend-suisse:latest \
-            --build-arg VITE_API_URL=${VITE_API_URL_CH} \
-            --build-arg VITE_COUNTRY=${VITE_COUNTRY_CH} \
-            --build-arg VITE_LOCALE=${VITE_LOCALE_CH} \
-            --build-arg VITE_GDPR_MODE=${VITE_GDPR_MODE_CH} \
-            --build-arg VITE_MULTI_LANG=${VITE_MULTI_LANG_CH} \
-            -f frontend/Dockerfile ./frontend
-          docker push ghcr.io/${REPO_LC}/frontend-suisse:latest
+            docker build -t ghcr.io/${REPO_LC}/frontend-france:latest \
+              --build-arg VITE_API_URL=${VITE_API_URL_FR} \
+              --build-arg VITE_COUNTRY=${VITE_COUNTRY_FR} \
+              --build-arg VITE_LOCALE=${VITE_LOCALE_FR} \
+              --build-arg VITE_GDPR_MODE=${VITE_GDPR_MODE_FR} \
+              --build-arg VITE_MULTI_LANG=${VITE_MULTI_LANG_FR} \
+              -f frontend/Dockerfile ./frontend
+            docker push ghcr.io/${REPO_LC}/frontend-france:latest
 
-          # ETL
-          docker build -t ghcr.io/${REPO_LC}/etl-suisse:latest -f csv_to_postgres/Dockerfile .
-          docker push ghcr.io/${REPO_LC}/etl-suisse:latest
+            docker build -t ghcr.io/${REPO_LC}/etl-france:latest -f csv_to_postgres/Dockerfile .
+            docker push ghcr.io/${REPO_LC}/etl-france:latest
+          fi
+
+          # Suisse
+          if [ "${VITE_COUNTRY}" = "CH" ]; then
+            docker build -t ghcr.io/${REPO_LC}/backend-suisse:latest -f backend/Dockerfile ./backend
+            docker push ghcr.io/${REPO_LC}/backend-suisse:latest
+
+            docker build -t ghcr.io/${REPO_LC}/api-ia-suisse:latest -f ml_api/Dockerfile ./ml_api
+            docker push ghcr.io/${REPO_LC}/api-ia-suisse:latest
+
+            docker build -t ghcr.io/${REPO_LC}/frontend-suisse:latest \
+              --build-arg VITE_API_URL=${VITE_API_URL_CH} \
+              --build-arg VITE_COUNTRY=${VITE_COUNTRY_CH} \
+              --build-arg VITE_LOCALE=${VITE_LOCALE_CH} \
+              --build-arg VITE_GDPR_MODE=${VITE_GDPR_MODE_CH} \
+              --build-arg VITE_MULTI_LANG=${VITE_MULTI_LANG_CH} \
+              -f frontend/Dockerfile ./frontend
+            docker push ghcr.io/${REPO_LC}/frontend-suisse:latest
+
+            docker build -t ghcr.io/${REPO_LC}/etl-suisse:latest -f csv_to_postgres/Dockerfile .
+            docker push ghcr.io/${REPO_LC}/etl-suisse:latest
+          fi
+
+          # USA (pas de backend)
+          if [ "${VITE_COUNTRY}" = "USA" ]; then
+            docker build -t ghcr.io/${REPO_LC}/api-ia-usa:latest -f ml_api/Dockerfile ./ml_api
+            docker push ghcr.io/${REPO_LC}/api-ia-usa:latest
+
+            docker build -t ghcr.io/${REPO_LC}/frontend-usa:latest \
+              --build-arg VITE_API_URL=${VITE_API_URL_USA} \
+              --build-arg VITE_COUNTRY=${VITE_COUNTRY_USA} \
+              --build-arg VITE_LOCALE=${VITE_LOCALE_USA} \
+              --build-arg VITE_GDPR_MODE=${VITE_GDPR_MODE_USA} \
+              --build-arg VITE_MULTI_LANG=${VITE_MULTI_LANG_USA} \
+              -f frontend/Dockerfile ./frontend
+            docker push ghcr.io/${REPO_LC}/frontend-usa:latest
+
+            docker build -t ghcr.io/${REPO_LC}/etl-usa:latest -f csv_to_postgres/Dockerfile .
+            docker push ghcr.io/${REPO_LC}/etl-usa:latest
+          fi
