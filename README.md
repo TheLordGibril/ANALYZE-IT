@@ -21,6 +21,8 @@ cd ANALYZE-IT
 
 Copiez le fichier `.env.example` en `.env` dans le dossier racine et adaptez les variables d’environnement selon le pays et les ports souhaités.
 
+Vérifier que l'encodage du fichier 'entrypoint.sh' est bien sur LF, et non CRLF.
+
 ### 3. Lancer les bases de données et services avec Docker Compose
 
 ```bash
