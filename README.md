@@ -1,272 +1,57 @@
-# 📦 Livrables - Projet d’analyse de données pandémiques
+# ANALYZE-IT
 
-MICHAUD Gabriel
-FERRARETTO Kevin
-CERDAN Antoine
-KARAKHANYAN Gabriel
+Ce projet est une plateforme d'analyse et de prédiction de pandémie multi-pays (France, Suisse, USA).
 
-## 1. Modèle de données UML
+## Prérequis
 
-- UML : `csv_to_postgres/schema BDD.svg`
-- MCD : `csv_to_postgres/MCD.svg`
-- MLD : `csv_to_postgres/MLD.svg`
-- MPD : `csv_to_postgres/MPD.svg`
+- Node.js >= 18
+- Python >= 3.10
+- Docker & Docker Compose
 
-Représentation complète du schéma relationnel de la base de données utilisée pour centraliser les différentes sources de données.
+## Installation
 
----
-
-## 2. Base de données relationnelle & script de création
-
-Afin de créer la base de données PostgreSQL, veuillez télécharger la suite logicielle PostgreSQL :
-
-👉 [PostgreSQL - EnterpriseDB](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
-
-### Étapes de mise en place :
-
-1. Installer PostgreSQL et pgAdmin.
-2. Lancer pgAdmin et créer un **nouveau serveur**.
-    - Exemple :
-        - Nom du serveur : `localhost`
-        - Hostname : `localhost`
-        - Username : `postgres` ou celui défini à l'installation de PostgreSQL
-        - Mot de passe : celui défini à l’installation de PostgreSQL
-3. Créer une **nouvelle base de données** nommée `MSPR`.
-
----
-
-## 3. Mise en fonctionnement de l’Apollo Server
-
-**GraphQL** permet des requêtes souples et ciblées sur les données nettoyées.
-
-### Configuration des variables d’environnement
-
-Avant de lancer le serveur, configurez les variables d’environnement nécessaires à la connexion à la base de données PostgreSQL.
-
-1. Copiez le fichier `.env.example` en `.env` dans le dossier `backend` :
+### 1. Cloner le dépôt
 
 ```bash
-cp .env.example .env
+git clone https://github.com/votre-utilisateur/ANALYZE-IT.git
+cd ANALYZE-IT
 ```
 
-2. Ouvrez le fichier `.env` et remplacez les valeurs par défaut par vos informations réelles, notamment le **mot de passe** et le **nom d’utilisateur** PostgreSQL si vous les avez modifiés lors de l’installation.
+### 2. Configurer les variables d'environnement
 
-Exemple de section à modifier dans `.env` :
+Copiez le fichier `.env.example` en `.env` dans le dossier racine et adaptez les variables d’environnement selon le pays et les ports souhaités.
 
-```
-DATABASE_URL="postgresql://<utilisateur>:<mot_de_passe>@localhost:5432/MSPR?schema=public"
-```
+Vérifier que l'encodage du fichier 'entrypoint.sh' est bien sur LF, et non CRLF.
 
-Assurez-vous que ces informations correspondent à celles de votre instance PostgreSQL.
-
-### Installation des dépendances
-
-Depuis le dossier `backend` :
+### 3. Lancer les bases de données et services avec Docker Compose
 
 ```bash
-npm install
+# Pour la France
+docker compose -f docker-compose.fr.yml up -d
+
+# Pour la Suisse
+docker compose -f docker-compose.ch.yml up -d
+
+# Pour les USA
+docker compose -f docker-compose.usa.yml up -d
 ```
 
-### Déploiement des migrations Prisma
-
-```bash
-npx prisma migrate deploy
-```
-
-### Génération du client Prisma
-
-```bash
-npx prisma generate
-```
-
-### Lancement du serveur
-
-```bash
-npm run start
-```
+Accédez à l’application sur l’URL et le port définis dans votre fichier `.env` (par exemple : `http://localhost:<PORT>`).
 
 ---
 
-## 4. Importation des données dans la base
+# Livrables
 
-Depuis le dossier `csv_to_postgres` :
+- Des scripts et configurations pour le déploiement de l'infrastructure : voir https://github.com/TheLordGibril/ansible-analyze-it
+- Des fichiers Docker pour la conteneurisation des solutions. : Dockerfile dans frontend/, ml_api/ et backend/, et 3 fichiers Docker Compose à la racine du projet, un par pays.
+- Des mécanismes de sauvegarde et de restauration des données et des services. : Dans le projet Ansible : roles/docker/files/backup, il y a un fichier `entrypoint.sh` qui est exécuté au lancement du docker compose de prod, et si on veut restorer, le script `restore.sh` restaure la dernière sauvegarde qui a été effectuée.
+- Des fichiers relatifs aux pipelines d'intégration et des déploiements continus, incluant les étapes de build, test, analyse de code, et déploiement. : .github/worflows/main.yml
 
-1. Créer un environnement virtuel :
+- Une documentation détaillée du pipeline, avec des instructions pour son utilisation et sa maintenance. : Voir PDF
+- Une documentation détaillée de vos images Docker/ Podman : Voir PDF
+- Des rapports de tests automatisés et indicateurs de qualité de code. : Générés dans les annotations de Github Actions, par exemple : https://github.com/TheLordGibril/ANALYZE-IT/actions/runs/17325212828 en bas de page.
+- Une documentation de l'architecture système en format UML. : Voir PDF
 
-```bash
-py -m venv venv
-```
-
-2. Installer les dépendances :
-
-```bash
-pip install -r requirements.txt
-```
-
-3. Crée le `.env` à l'aide du `.env.exemple` :
-
-```bash
-# Configuration base de données
-DB_HOST=
-DB_PORT=
-DB_NAME=
-DB_USER=
-DB_PASSWORD=
-
-CSV_FILE_PATH=
-```
-
-4. Lancer le script d’importation :
-
-```bash
-py migration-script.py
-```
-
----
-
-## 5. Code ETL
-
-📁 Notebook Jupyter : `etl/data_cleaning.ipynb`
-
-Contient l’ensemble du processus de préparation, nettoyage et fusion des données brutes.
-
----
-
-## 6. Documentation API (OpenAPI Spec)
-
-Le fichier `backend/openapi.yaml` est ouvrable avec l'outil suivant, fourni par Swagger : https://swagger.io/tools/swagger-editor/
-
----
-
-## 7. Tableau de bord interactif
-
-**Outil utilisé :** Power BI
-
-**Objectif :**
-
-Observer l’évolution de la contamination et de la mortalité des virus COVID-19 et de la variole du singe dans le monde.
-
-### Sources de données
-
-- Base de données PostgreSQL
-- Tables : `Pays`, `Virus`, `Statistiques journalières`
-
-### Indicateurs clés
-
-**Statistiques journalières :**
-
-- **Contamination** : Nombre total de cas, nombre de nouveaux cas, taux d’infection → *deuxième page*
-- **Mortalité** : Nombre total de décès, nombre de nouveaux décès, taux de mortalité → *troisième page*
-
-### Fonctionnalités
-
-- Sélection des pays → *Première page*
-- Sélection du virus → *Première page*
-- Parcours des périodes (années, trimestres, mois, jours) → *via interaction avec les graphiques*
-
-### Justification
-
-Nous avons souhaité que l’utilisation de Power BI soit la plus simple possible pour l’utilisateur, notamment grâce à un design agréable et épuré.
-
-Afin d’améliorer la lisibilité des graphiques, la section "Filtres" a été séparée sur une première page dédiée.
-
-Il est possible d’y sélectionner un virus à l’aide de boutons radio, car la visualisation simultanée des données des deux virus n’est pas lisible.
-
-Pour la sélection des pays, plusieurs options sont possibles : ne rien sélectionner, tout sélectionner (pour avoir les données mondiales), ou choisir un pays ou un groupe de pays grâce à la barre de recherche.
-
-### Visualisation des données
-
-Chaque page affiche 6 éléments d’information :
-
-1. Le nom de la page actuelle (en gras)
-2. Le virus sélectionné
-3. Le(s) pays sélectionné(s) :
-    - Si aucun ou tous les pays sont sélectionnés → **Monde entier**
-    - Si un seul pays est sélectionné → **Nom du pays**
-    - Si plusieurs pays sont sélectionnés → **"Plusieurs pays sélectionnés"**
-4. Un graphique de l’évolution des cas totaux dans le temps
-5. Un graphique de l’évolution des nouveaux cas dans le temps
-6. Un graphique de l’évolution des taux (de mortalité ou de contamination) dans le temps
-
-### Choix des visualisations
-
-- **Cas totaux** : affichés sous forme de courbe pour faciliter la lecture dans le temps, notamment avec un grand volume de données journalières.
-- **Nouveaux cas et taux** : affichés sous forme de graphiques en barres, permettant :
-    - La comparaison visuelle avec les périodes précédentes
-    - L’exploration de plages temporelles précises (grâce à l’interaction avec les barres)
-    - La descente dans la hiérarchie temporelle (année → trimestre → mois → jour) via le mode exploration
-    - La possibilité de remonter dans la hiérarchie à l’aide du bouton situé à gauche du graphique
-
-### Export des données
-
-L'export des données peut se faire directement depuis Power BI de manière très modulable. Il suffit de sélectionner les données souhaitées en cliquant sur le graphique puis de cliquer sur les trois points et "Exporter". Ainsi, un fichier CSV contenant les données souhaitées sera téléchargé.
-
----
-
-## 8. Documentation détaillée : collecte et nettoyage des données
-
-> La fusion des jeux de données repose sur une normalisation préalable de chaque source pour garantir une homogénéité avant la fusion. Cela permet de minimiser les incohérences et de limiter le nettoyage post-fusion.
-
-### Étapes clés :
-
-1. Suppression des colonnes inutiles et harmonisation des noms
-2. Gestion des valeurs manquantes (suppression ou imputation)
-3. Formatage des types (dates, float, etc.)
-4. Vérification de la cohérence intercolonnes
-5. Suppression des doublons intradataset
-6. Fusion des datasets
-7. Détection de doublons interdatasets après fusion
-8. Feature Engineering :
-    - Taux de croissance des cas
-    - Taux de mortalité
-    - % de population touchée
-    - Saisonnalité
-    - Moyennes mondiales de référence
-
-Vous trouverez plus de détails dans le fichier `etl/data_cleaning.ipynb` concernant la démarche suivie. Le code est commenté et documenté.
-
----
-
-## 9. Benchmark des solutions techniques
-
-### **ETL & Préparation**
-
-- `Pandas` → Référence en traitement CSV
-- `Jupyter Notebook` → Itération rapide et visualisation instantanée
-
----
-
-### **Stockage des données**
-
-- **PostgreSQL (choix)** → Choix principal, robuste & intégré
-- **Alternatives** :
-    - MySQL / MariaDB → Bonne alternative si PostgreSQL n’est pas requis
-    - DuckDB → Idéal pour requêtes analytiques sur des fichiers locaux
-    - ClickHouse → Très rapide pour de la data analytique
-    - BigQuery → Si besoin de requêter des datasets massifs sur le cloud
-- **ORMs** :
-    - Prisma (Node.js) → ORM typé, moderne et multi-SGBD
-    - SQLAlchemy (Python) → Intégré pour l’export depuis le notebook
-
----
-
-### **API & CRUD**
-
-- **GraphQL (choix)** → Requêtage ciblé et structuré comme demandé
-- **REST (FastAPI, Express.js)** → Standard mais moins souple
-- **Librairies** : Apollo Server (Node.js)
-
----
-
-### **Visualisation des données**
-
-- **Power BI (choix)** → Recommandé pour filtres, export, et dashboards clairs
-- **Matplotlib**, **Seaborn** → Explorations initiales
-- **Plotly**, **Bokeh** → Graphiques interactifs
-- **Apache Superset**, **Metabase** → Solutions open-source
-
----
-
-## 10. Diagramme de Gantt
-
-`Gantt.png`
+- Des rapports de sprint incluant les objectifs et les réalisations. : Voir PDF
+- Un tableau Kanban illustrant l’avancement des tâches. : Voir PDF
+- La présentation de l’ensemble des cérémonies utilisées en fonction du choix de votre méthode agile. : Voir PDF
